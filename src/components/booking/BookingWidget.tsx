@@ -4,6 +4,7 @@ import BookingCalendar from "./BookingCalendar";
 import TimeSlotPicker from "./TimeSlotPicker";
 import BookingConfirmation, { BookingFormData } from "./BookingConfirmation";
 import { toast } from "@/hooks/use-toast";
+import RevenuegridLogo from "@/assets/revenuegrid-logo.svg";
 
 interface BookingWidgetProps {
   title?: string;
@@ -12,6 +13,8 @@ interface BookingWidgetProps {
   organizerName?: string;
   organizerEmail?: string;
   timezone?: string;
+  isRescheduling?: boolean;
+  onComplete?: () => void;
 }
 
 const BookingWidget = ({
@@ -21,6 +24,8 @@ const BookingWidget = ({
   organizerName = "Maksym Osypenko",
   organizerEmail = "maksym.osypenko@revenuegrid.com",
   timezone = "(UTC +02:00) Kyiv",
+  isRescheduling = false,
+  onComplete,
 }: BookingWidgetProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 0, 27));
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -37,10 +42,10 @@ const BookingWidget = ({
 
   const handleConfirm = (formData: BookingFormData) => {
     toast({
-      title: "Meeting Booked!",
-      description: `Your meeting with ${organizerName} has been confirmed for ${selectedDate?.toLocaleDateString()} at ${selectedTime}.`,
+      title: isRescheduling ? "Meeting Rescheduled!" : "Meeting Booked!",
+      description: `Your meeting with ${organizerName} has been ${isRescheduling ? "rescheduled" : "confirmed"} for ${selectedDate?.toLocaleDateString()} at ${selectedTime}.`,
     });
-    console.log("Booking confirmed:", { date: selectedDate, time: selectedTime, ...formData });
+    onComplete?.();
   };
 
   if (step === "confirm" && selectedDate && selectedTime) {
@@ -62,7 +67,17 @@ const BookingWidget = ({
 
   return (
     <div className="min-h-screen bg-muted flex flex-col">
-      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+      {/* Header for reschedule mode */}
+      {isRescheduling && (
+        <header className="py-4 px-6 flex items-center justify-between border-b border-border bg-card">
+          <img src={RevenuegridLogo} alt="Revenue Grid" className="h-7" />
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
+            Rescheduling
+          </span>
+        </header>
+      )}
+
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 mt-12">
         <div className="bg-card rounded-2xl shadow-lg border border-border w-full max-w-4xl overflow-hidden">
           <div className="p-8 md:p-12">
             <BookingHeader

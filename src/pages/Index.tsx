@@ -1,7 +1,57 @@
+import { useState } from "react";
+import BookingWidget from "@/components/booking/BookingWidget";
 import BookingWizard from "@/components/booking/BookingWizard";
+import AttendeeView from "@/components/booking/AttendeeView";
+import ViewSwitcher, { ViewMode } from "@/components/booking/ViewSwitcher";
 
 const Index = () => {
-  return <BookingWizard />;
+  const [viewMode, setViewMode] = useState<ViewMode>("organizer-wizard");
+  const [isRescheduling, setIsRescheduling] = useState(false);
+
+  const handleReschedule = () => {
+    setIsRescheduling(true);
+  };
+
+  const handleRescheduleComplete = () => {
+    setIsRescheduling(false);
+    setViewMode("attendee");
+  };
+
+  const renderView = () => {
+    // If rescheduling from attendee view, show wizard in reschedule mode
+    if (isRescheduling) {
+      return (
+        <BookingWizard 
+          isRescheduling={true} 
+          onComplete={handleRescheduleComplete}
+        />
+      );
+    }
+
+    switch (viewMode) {
+      case "organizer-classic":
+        return <BookingWidget />;
+      case "organizer-wizard":
+        return <BookingWizard />;
+      case "attendee":
+        return <AttendeeView onReschedule={handleReschedule} />;
+      default:
+        return <BookingWizard />;
+    }
+  };
+
+  return (
+    <>
+      <ViewSwitcher 
+        currentView={isRescheduling ? "organizer-wizard" : viewMode} 
+        onChange={(view) => {
+          setIsRescheduling(false);
+          setViewMode(view);
+        }} 
+      />
+      {renderView()}
+    </>
+  );
 };
 
 export default Index;
