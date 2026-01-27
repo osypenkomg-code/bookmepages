@@ -1,7 +1,7 @@
-import BookingWidget from "@/components/booking/BookingWidget";
+import BookingWizard from "@/components/booking/BookingWizard";
 
 const Index = () => {
-  return <BookingWidget />;
+  return <BookingWizard />;
 };
 
 export default Index;
