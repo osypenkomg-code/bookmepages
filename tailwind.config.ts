@@ -57,6 +57,16 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // RevenueGrid Brand Colors
+        rg: {
+          sage: "hsl(var(--rg-sage))",
+          "sage-light": "hsl(var(--rg-sage-light))",
+          coral: "hsl(var(--rg-coral))",
+          "coral-hover": "hsl(var(--rg-coral-hover))",
+          navy: "hsl(var(--rg-navy))",
+          text: "hsl(var(--rg-text))",
+          "text-muted": "hsl(var(--rg-text-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
