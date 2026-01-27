@@ -24,6 +24,8 @@ interface BookingWizardProps {
   organizerName?: string;
   organizerEmail?: string;
   timezone?: string;
+  isRescheduling?: boolean;
+  onComplete?: () => void;
 }
 
 const STEPS = ["Date", "Time", "Platform", "Details"];
@@ -54,14 +56,16 @@ const BookingWizard = ({
   organizerName = "Maksym Osypenko",
   organizerEmail = "maksym.osypenko@revenuegrid.com",
   timezone = "(UTC +02:00) Kyiv",
+  isRescheduling = false,
+  onComplete,
 }: BookingWizardProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<LocationType>("zoom");
   const [formData, setFormData] = useState<BookingFormData>({
-    fullName: "",
-    email: "",
+    fullName: isRescheduling ? "John Doe" : "",
+    email: isRescheduling ? "john.doe@example.com" : "",
     phoneNumber: "",
     notes: "",
   });
@@ -92,9 +96,10 @@ const BookingWizard = ({
 
   const handleSubmit = () => {
     toast({
-      title: "Meeting Booked!",
-      description: `Your meeting has been confirmed for ${selectedDate?.toLocaleDateString()} at ${selectedTime} via ${LOCATION_NAMES[selectedLocation]}.`,
+      title: isRescheduling ? "Meeting Rescheduled!" : "Meeting Booked!",
+      description: `Your meeting has been ${isRescheduling ? "rescheduled" : "confirmed"} for ${selectedDate?.toLocaleDateString()} at ${selectedTime} via ${LOCATION_NAMES[selectedLocation]}.`,
     });
+    onComplete?.();
   };
 
   const handleFormChange = (field: keyof BookingFormData, value: string) => {
@@ -116,7 +121,7 @@ const BookingWizard = ({
         return (
           <div className="flex flex-col items-center">
             <h2 className="text-xl font-semibold text-foreground mb-6">
-              Select a date
+              {isRescheduling ? "Select a new date" : "Select a date"}
             </h2>
             <BookingCalendar
               selectedDate={selectedDate}
@@ -129,7 +134,7 @@ const BookingWizard = ({
         return (
           <div className="flex flex-col items-center w-full max-w-md">
             <h2 className="text-xl font-semibold text-foreground mb-2">
-              Select a time
+              {isRescheduling ? "Select a new time" : "Select a time"}
             </h2>
             <p className="text-sm text-muted-foreground mb-6">
               {selectedDate && formatDate(selectedDate)} • {timezone}
@@ -173,7 +178,7 @@ const BookingWizard = ({
         return (
           <div className="w-full max-w-md">
             <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
-              Your details
+              {isRescheduling ? "Confirm details" : "Your details"}
             </h2>
             
             {/* Summary */}
@@ -236,10 +241,12 @@ const BookingWizard = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Notes (optional)</Label>
+                <Label htmlFor="notes">
+                  {isRescheduling ? "Reason for rescheduling (optional)" : "Notes (optional)"}
+                </Label>
                 <Textarea
                   id="notes"
-                  placeholder="Anything you'd like to discuss?"
+                  placeholder={isRescheduling ? "Why are you rescheduling?" : "Anything you'd like to discuss?"}
                   value={formData.notes}
                   onChange={(e) => handleFormChange("notes", e.target.value)}
                   className="min-h-[80px] resize-none"
@@ -259,13 +266,20 @@ const BookingWizard = ({
       {/* Header */}
       <header className="py-4 px-6 flex items-center justify-between border-b border-border bg-card">
         <img src={RevenuegridLogo} alt="Revenue Grid" className="h-7" />
-        <div className="text-right">
-          <p className="text-sm font-medium text-foreground">{title}</p>
-          <p className="text-xs text-muted-foreground">{duration} • {organizerEmail}</p>
+        <div className="flex items-center gap-4">
+          {isRescheduling && (
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
+              Rescheduling
+            </span>
+          )}
+          <div className="text-right">
+            <p className="text-sm font-medium text-foreground">{title}</p>
+            <p className="text-xs text-muted-foreground">{duration} • {organizerEmail}</p>
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 mt-12">
         <div className="bg-card rounded-2xl shadow-lg border border-border w-full max-w-2xl overflow-hidden">
           <div className="p-6 md:p-10">
             <StepIndicator steps={STEPS} currentStep={currentStep} />
@@ -291,7 +305,10 @@ const BookingWizard = ({
                 disabled={!canProceed()}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground px-6"
               >
-                {currentStep === STEPS.length - 1 ? "Book Meeting" : "Continue"}
+                {currentStep === STEPS.length - 1 
+                  ? (isRescheduling ? "Confirm Reschedule" : "Book Meeting")
+                  : "Continue"
+                }
                 {currentStep < STEPS.length - 1 && <ChevronRight className="w-4 h-4 ml-1" />}
               </Button>
             </div>
