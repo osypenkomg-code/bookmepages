@@ -28,7 +28,7 @@ interface BookingWizardProps {
   onComplete?: () => void;
 }
 
-const STEPS = ["Date", "Time", "Platform", "Details"];
+const STEPS = ["Date & Time", "Platform", "Details"];
 
 const TIME_SLOTS = [
   { time: "09:00 AM", available: true },
@@ -72,10 +72,9 @@ const BookingWizard = ({
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return selectedDate !== null;
-      case 1: return selectedTime !== null;
-      case 2: return selectedLocation !== null;
-      case 3: return formData.email.trim() !== "";
+      case 0: return selectedDate !== null && selectedTime !== null;
+      case 1: return selectedLocation !== null;
+      case 2: return formData.email.trim() !== "";
       default: return false;
     }
   };
@@ -119,49 +118,50 @@ const BookingWizard = ({
     switch (currentStep) {
       case 0:
         return (
-          <div className="flex flex-col items-center">
-            <h2 className="text-xl font-semibold text-foreground mb-6">
-              {isRescheduling ? "Select a new date" : "Select a date"}
-            </h2>
-            <BookingCalendar
-              selectedDate={selectedDate}
-              onDateSelect={setSelectedDate}
-            />
+          <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full">
+            {/* Calendar */}
+            <div className="flex flex-col items-center">
+              <h2 className="text-xl font-semibold text-foreground mb-6">
+                {isRescheduling ? "Select a new date & time" : "Select a date & time"}
+              </h2>
+              <BookingCalendar
+                selectedDate={selectedDate}
+                onDateSelect={setSelectedDate}
+              />
+            </div>
+            
+            {/* Time Slots */}
+            {selectedDate && (
+              <div className="flex flex-col items-center w-full max-w-xs">
+                <p className="text-sm text-muted-foreground mb-2">
+                  {formatDate(selectedDate)}
+                </p>
+                <p className="text-xs text-muted-foreground mb-4">{timezone}</p>
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  {TIME_SLOTS.map((slot) => (
+                    <button
+                      key={slot.time}
+                      onClick={() => slot.available && setSelectedTime(slot.time)}
+                      disabled={!slot.available}
+                      className={cn(
+                        "py-2.5 px-3 rounded-lg border-2 text-sm font-medium transition-all duration-200",
+                        selectedTime === slot.time
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : slot.available
+                            ? "border-border hover:border-primary/50 text-foreground"
+                            : "border-border/50 text-muted-foreground/50 cursor-not-allowed line-through"
+                      )}
+                    >
+                      {slot.time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
 
       case 1:
-        return (
-          <div className="flex flex-col items-center w-full max-w-md">
-            <h2 className="text-xl font-semibold text-foreground mb-2">
-              {isRescheduling ? "Select a new time" : "Select a time"}
-            </h2>
-            <p className="text-sm text-muted-foreground mb-6">
-              {selectedDate && formatDate(selectedDate)} • {timezone}
-            </p>
-            <div className="grid grid-cols-3 gap-3 w-full">
-              {TIME_SLOTS.map((slot) => (
-                <button
-                  key={slot.time}
-                  onClick={() => slot.available && setSelectedTime(slot.time)}
-                  disabled={!slot.available}
-                  className={cn(
-                    "py-3 px-4 rounded-lg border-2 text-sm font-medium transition-all duration-200",
-                    selectedTime === slot.time
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : slot.available
-                        ? "border-border hover:border-primary/50 text-foreground"
-                        : "border-border/50 text-muted-foreground/50 cursor-not-allowed line-through"
-                  )}
-                >
-                  {slot.time}
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 2:
         return (
           <div className="flex flex-col items-center">
             <h2 className="text-xl font-semibold text-foreground mb-6">
@@ -174,7 +174,7 @@ const BookingWizard = ({
           </div>
         );
 
-      case 3:
+      case 2:
         return (
           <div className="w-full max-w-md">
             <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
