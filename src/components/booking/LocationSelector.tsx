@@ -63,14 +63,14 @@ const LocationSelector = ({ selected, onChange }: LocationSelectorProps) => {
   const selectedLocation = locations.find(loc => loc.id === selected);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-4">
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-3 gap-4">
         {locations.map((loc) => (
           <button
             key={loc.id}
             onClick={() => onChange(loc.id)}
             className={cn(
-              "relative flex flex-col items-center gap-3 px-8 py-5 rounded-xl border-2 transition-all duration-200",
+              "relative flex flex-col items-center justify-center gap-3 w-32 h-32 rounded-xl border-2 transition-all duration-200",
               "hover:border-primary/50 hover:bg-secondary/50",
               selected === loc.id
                 ? "border-primary bg-primary/5 shadow-md"
@@ -88,7 +88,7 @@ const LocationSelector = ({ selected, onChange }: LocationSelectorProps) => {
               {loc.icon}
             </div>
             <span className={cn(
-              "text-sm font-medium",
+              "text-xs font-medium text-center leading-tight",
               selected === loc.id ? "text-foreground" : "text-muted-foreground"
             )}>
               {loc.name}
@@ -99,7 +99,7 @@ const LocationSelector = ({ selected, onChange }: LocationSelectorProps) => {
       
       {/* Description text */}
       {selectedLocation && (
-        <div className="text-center p-3 bg-secondary/50 rounded-lg">
+        <div className="text-center p-3 bg-secondary/50 rounded-lg max-w-md mx-auto">
           <p className="text-sm text-muted-foreground">
             {selectedLocation.description}
           </p>
