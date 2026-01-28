@@ -2,6 +2,7 @@ import { useState } from "react";
 import BookingWidget from "@/components/booking/BookingWidget";
 import BookingWizard from "@/components/booking/BookingWizard";
 import AttendeeView from "@/components/booking/AttendeeView";
+import EmailPreview from "@/components/booking/EmailPreview";
 import ViewSwitcher, { ViewMode } from "@/components/booking/ViewSwitcher";
 
 const Index = () => {
@@ -35,6 +36,8 @@ const Index = () => {
         return <BookingWizard />;
       case "attendee":
         return <AttendeeView onReschedule={handleReschedule} />;
+      case "email-preview":
+        return <EmailPreview />;
       default:
         return <BookingWizard />;
     }
