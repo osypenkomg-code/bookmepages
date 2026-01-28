@@ -59,8 +59,20 @@ const BookingWizard = ({
   isRescheduling = false,
   onComplete,
 }: BookingWizardProps) => {
+  // Auto-select today or next available date (27th for demo)
+  const getInitialDate = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // For demo, dates from 27th onwards are available
+    if (today.getDate() >= 27) {
+      return today;
+    }
+    // Otherwise select the 27th of current month
+    return new Date(today.getFullYear(), today.getMonth(), 27);
+  };
+
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(getInitialDate());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<LocationType>("zoom");
   const [formData, setFormData] = useState<BookingFormData>({
