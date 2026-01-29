@@ -367,9 +367,17 @@ const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
   );
 };
 
-const EmailPreview = () => {
+interface EmailPreviewProps {
+  isMobilePreview?: boolean;
+}
+
+const EmailPreview = ({ isMobilePreview: externalMobilePreview }: EmailPreviewProps) => {
   const [selectedType, setSelectedType] = useState<EmailType>("host-confirmation");
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [internalMobileView, setInternalMobileView] = useState(false);
+  
+  // Use external mobile preview if provided, otherwise use internal toggle
+  const isMobileView = externalMobilePreview ?? internalMobileView;
+  const showInternalToggle = externalMobilePreview === undefined;
 
   const renderEmail = () => {
     switch (selectedType) {
@@ -394,24 +402,26 @@ const EmailPreview = () => {
         <p className="text-sm text-muted-foreground">{currentType?.description}</p>
       </div>
 
-      {/* Mobile Toggle */}
-      <div className="max-w-2xl mx-auto mb-4 px-4">
-        <div className="flex items-center justify-center gap-4 bg-card rounded-lg p-3 border border-border">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Monitor className={cn("w-5 h-5", !isMobileView && "text-primary")} />
-            <span className={cn("text-sm font-medium", !isMobileView && "text-foreground")}>Desktop</span>
-          </div>
-          <Switch
-            id="mobile-view"
-            checked={isMobileView}
-            onCheckedChange={setIsMobileView}
-          />
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Smartphone className={cn("w-5 h-5", isMobileView && "text-primary")} />
-            <span className={cn("text-sm font-medium", isMobileView && "text-foreground")}>Mobile</span>
+      {/* Mobile Toggle - only show if not controlled externally */}
+      {showInternalToggle && (
+        <div className="max-w-2xl mx-auto mb-4 px-4">
+          <div className="flex items-center justify-center gap-4 bg-card rounded-lg p-3 border border-border">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Monitor className={cn("w-5 h-5", !isMobileView && "text-primary")} />
+              <span className={cn("text-sm font-medium", !isMobileView && "text-foreground")}>Desktop</span>
+            </div>
+            <Switch
+              id="mobile-view"
+              checked={internalMobileView}
+              onCheckedChange={setInternalMobileView}
+            />
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Smartphone className={cn("w-5 h-5", isMobileView && "text-primary")} />
+              <span className={cn("text-sm font-medium", isMobileView && "text-foreground")}>Mobile</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Email Type Tabs */}
       <div className="max-w-2xl mx-auto mb-6 px-4">

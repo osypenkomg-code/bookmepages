@@ -5,11 +5,13 @@ import AttendeeView from "@/components/booking/AttendeeView";
 import EmailPreview from "@/components/booking/EmailPreview";
 import TooLateToModify from "@/components/booking/TooLateToModify";
 import ViewSwitcher, { ViewMode } from "@/components/booking/ViewSwitcher";
+import MobileFrame from "@/components/booking/MobileFrame";
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("organizer-wizard");
   const [isRescheduling, setIsRescheduling] = useState(false);
   const [tooLateAction, setTooLateAction] = useState<"reschedule" | "cancel">("reschedule");
+  const [isMobilePreview, setIsMobilePreview] = useState(false);
 
   const handleReschedule = () => {
     setIsRescheduling(true);
@@ -39,7 +41,7 @@ const Index = () => {
       case "attendee":
         return <AttendeeView onReschedule={handleReschedule} />;
       case "email-preview":
-        return <EmailPreview />;
+        return <EmailPreview isMobilePreview={isMobilePreview} />;
       case "too-late":
         return (
           <TooLateToModify 
@@ -52,6 +54,9 @@ const Index = () => {
     }
   };
 
+  // Email preview handles its own mobile frame
+  const shouldUseMobileFrame = isMobilePreview && viewMode !== "email-preview";
+
   return (
     <>
       <ViewSwitcher 
@@ -59,9 +64,13 @@ const Index = () => {
         onChange={(view) => {
           setIsRescheduling(false);
           setViewMode(view);
-        }} 
+        }}
+        isMobilePreview={isMobilePreview}
+        onMobilePreviewChange={setIsMobilePreview}
       />
-      {renderView()}
+      <MobileFrame enabled={shouldUseMobileFrame}>
+        {renderView()}
+      </MobileFrame>
     </>
   );
 };
