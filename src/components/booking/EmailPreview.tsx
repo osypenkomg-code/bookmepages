@@ -1,8 +1,9 @@
 import { useState } from "react";
 import RevenuegridLogo from "@/assets/revenuegrid-logo.svg";
-import { Calendar, Clock, MapPin, User, FileText, Phone, MessageSquare, RefreshCw, CalendarX, ExternalLink } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Clock, MapPin, User, FileText, Phone, MessageSquare, RefreshCw, CalendarX, Smartphone, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation";
 
@@ -368,6 +369,7 @@ const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
 
 const EmailPreview = () => {
   const [selectedType, setSelectedType] = useState<EmailType>("host-confirmation");
+  const [isMobileView, setIsMobileView] = useState(false);
 
   const renderEmail = () => {
     switch (selectedType) {
@@ -392,9 +394,31 @@ const EmailPreview = () => {
         <p className="text-sm text-muted-foreground">{currentType?.description}</p>
       </div>
 
+      {/* Mobile Toggle */}
+      <div className="max-w-2xl mx-auto mb-4 px-4">
+        <div className="flex items-center justify-center gap-4 bg-card rounded-lg p-3 border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Monitor className={cn("w-5 h-5", !isMobileView && "text-primary")} />
+            <span className={cn("text-sm font-medium", !isMobileView && "text-foreground")}>Desktop</span>
+          </div>
+          <Switch
+            id="mobile-view"
+            checked={isMobileView}
+            onCheckedChange={setIsMobileView}
+          />
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Smartphone className={cn("w-5 h-5", isMobileView && "text-primary")} />
+            <span className={cn("text-sm font-medium", isMobileView && "text-foreground")}>Mobile</span>
+          </div>
+        </div>
+      </div>
+
       {/* Email Type Tabs */}
-      <div className="max-w-2xl mx-auto mb-6">
-        <div className="flex flex-wrap justify-center gap-2 bg-card rounded-lg p-2 border border-border">
+      <div className="max-w-2xl mx-auto mb-6 px-4">
+        <div className={cn(
+          "flex flex-wrap justify-center gap-2 bg-card rounded-lg p-2 border border-border",
+          isMobileView && "flex-col"
+        )}>
           {emailTypes.map((type) => (
             <button
               key={type.id}
@@ -403,7 +427,8 @@ const EmailPreview = () => {
                 "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                 selectedType === type.id
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                isMobileView && "w-full text-center"
               )}
             >
               {type.label}
@@ -413,9 +438,35 @@ const EmailPreview = () => {
       </div>
 
       {/* Email Preview Container */}
-      <div className="max-w-2xl mx-auto">
-        {renderEmail()}
-        <TemplateVariables emailType={selectedType} />
+      <div className={cn(
+        "mx-auto transition-all duration-300",
+        isMobileView ? "max-w-[375px] px-2" : "max-w-2xl px-4"
+      )}>
+        {/* Mobile Frame */}
+        {isMobileView && (
+          <div className="bg-gray-800 rounded-[40px] p-3 shadow-2xl">
+            {/* Phone Notch */}
+            <div className="flex justify-center mb-2">
+              <div className="w-24 h-6 bg-gray-900 rounded-full"></div>
+            </div>
+            {/* Phone Screen */}
+            <div className="bg-white rounded-[28px] overflow-hidden max-h-[600px] overflow-y-auto">
+              <div className="transform scale-[0.85] origin-top">
+                {renderEmail()}
+              </div>
+            </div>
+            {/* Home Indicator */}
+            <div className="flex justify-center mt-2">
+              <div className="w-32 h-1 bg-gray-600 rounded-full"></div>
+            </div>
+          </div>
+        )}
+        
+        {!isMobileView && renderEmail()}
+        
+        <div className={cn(isMobileView && "mt-4")}>
+          <TemplateVariables emailType={selectedType} />
+        </div>
       </div>
 
       {/* Footer */}
