@@ -391,20 +391,20 @@ const BookingWizard = ({
 
       <div className={cn(
         "flex-1 flex items-start justify-center",
-        isMobile ? "p-2 pt-2" : "p-4 md:p-8 mt-12"
+        isMobile ? "p-2 pt-1" : "p-4 md:p-8 mt-12"
       )}>
         <div className={cn(
           "bg-card rounded-2xl shadow-lg border border-border w-full max-w-2xl overflow-hidden",
           isMobile && "rounded-xl"
         )}>
           <div className={cn(
-            isMobile ? "p-3" : "p-6 md:p-10"
+            isMobile ? "p-2 pb-3" : "p-6 md:p-10"
           )}>
             <StepIndicator steps={steps} currentStep={currentStep} compact={isMobile} />
             
             <div className={cn(
               "flex items-center justify-center",
-              isMobile ? "min-h-[280px]" : "min-h-[400px]"
+              isMobile ? "min-h-0" : "min-h-[400px]"
             )}>
               {renderStepContent()}
             </div>
@@ -412,7 +412,7 @@ const BookingWizard = ({
             {/* Navigation */}
             <div className={cn(
               "flex items-center justify-between border-t border-border",
-              isMobile ? "mt-4 pt-4" : "mt-8 pt-6"
+              isMobile ? "mt-3 pt-3" : "mt-8 pt-6"
             )}>
               <Button
                 variant="ghost"
