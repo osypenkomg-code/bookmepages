@@ -15,6 +15,7 @@ interface BookingConfirmationProps {
   timezone: string;
   organizerName: string;
   organizerEmail: string;
+  isMobilePreview?: boolean;
   onBack: () => void;
   onConfirm: (formData: BookingFormData) => void;
 }
@@ -44,6 +45,7 @@ const BookingConfirmation = ({
   timezone,
   organizerName,
   organizerEmail,
+  isMobilePreview = false,
   onBack,
   onConfirm,
 }: BookingConfirmationProps) => {
@@ -88,14 +90,14 @@ const BookingConfirmation = ({
         <img src={RevenuegridLogo} alt="Revenue Grid" className="h-8" />
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+      <div className={`flex-1 flex items-center justify-center p-4 ${isMobilePreview ? '' : 'md:p-8'}`}>
         <div className="bg-card rounded-2xl shadow-lg border border-border w-full max-w-4xl overflow-hidden">
-          <div className="p-8 md:p-12">
-            <h1 className="text-2xl md:text-3xl font-semibold text-rg-navy mb-6">
+          <div className={`p-6 ${isMobilePreview ? '' : 'md:p-12'}`}>
+            <h1 className={`text-2xl font-semibold text-rg-navy mb-6 ${isMobilePreview ? '' : 'md:text-3xl'}`}>
               Booking Confirmation
             </h1>
 
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+            <div className={`grid gap-6 ${isMobilePreview ? 'grid-cols-1' : 'md:grid-cols-2 md:gap-12'}`}>
               {/* Left Column - Booking Details */}
               <div>
                 <p className="text-muted-foreground mb-6">
