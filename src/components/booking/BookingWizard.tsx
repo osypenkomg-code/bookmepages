@@ -39,6 +39,8 @@ const LOCATION_NAMES: Record<LocationType, string> = {
   "google-meet": "Google Meet",
 };
 
+export type PlatformMode = "full" | "custom" | "disabled";
+
 interface BookingWizardProps {
   title?: string;
   duration?: string;
@@ -47,7 +49,7 @@ interface BookingWizardProps {
   timezone?: string;
   isRescheduling?: boolean;
   isMobilePreview?: boolean;
-  showPlatformSelection?: boolean;
+  platformMode?: PlatformMode;
   onComplete?: () => void;
 }
 
@@ -59,7 +61,7 @@ const BookingWizard = ({
   timezone = "(UTC +02:00) Kyiv",
   isRescheduling = false,
   isMobilePreview = false,
-  showPlatformSelection = true,
+  platformMode = "full",
   onComplete,
 }: BookingWizardProps) => {
   // Auto-select today or next available date (27th for demo)
@@ -78,14 +80,17 @@ const BookingWizard = ({
   // Use prop override if set, otherwise fall back to hook
   const isMobile = isMobilePreview || isMobileHook;
   
+  // Show platform step for "full" and "custom" modes, skip for "disabled"
+  const showPlatformStep = platformMode !== "disabled";
+  
   // Define steps based on device and platform selection setting
   const getSteps = () => {
     if (isMobile) {
-      return showPlatformSelection 
+      return showPlatformStep 
         ? ["Date", "Time", "Platform", "Details"]
         : ["Date", "Time", "Details"];
     } else {
-      return showPlatformSelection 
+      return showPlatformStep 
         ? ["Date & Time", "Platform", "Details"]
         : ["Date & Time", "Details"];
     }
@@ -97,9 +102,10 @@ const BookingWizard = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(getInitialDate());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   // Default to Teams when platform selection is disabled
-  const [selectedLocation, setSelectedLocation] = useState<LocationType>(
-    showPlatformSelection ? "zoom" : "teams"
+  const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(
+    platformMode === "disabled" ? "teams" : platformMode === "custom" ? null : "zoom"
   );
+  const [customLocation, setCustomLocation] = useState("");
   const [formData, setFormData] = useState<BookingFormData>({
     fullName: isRescheduling ? "John Doe" : "",
     email: isRescheduling ? "john.doe@example.com" : "",
@@ -107,10 +113,18 @@ const BookingWizard = ({
     notes: "",
   });
 
+  // Get the display name for the location
+  const getLocationDisplay = () => {
+    if (platformMode === "custom") {
+      return customLocation || "Custom location";
+    }
+    return selectedLocation ? LOCATION_NAMES[selectedLocation] : "Not selected";
+  };
+
   // Map current step to logical step based on device and platform selection
   const getLogicalStep = () => {
     if (isMobile) {
-      if (showPlatformSelection) {
+      if (showPlatformStep) {
         // Mobile with platform: 0=Date, 1=Time, 2=Platform, 3=Details
         return currentStep;
       } else {
@@ -121,7 +135,7 @@ const BookingWizard = ({
         return 3;
       }
     } else {
-      if (showPlatformSelection) {
+      if (showPlatformStep) {
         // Desktop with platform: 0=Date&Time, 1=Platform, 2=Details → map to 0, 2, 3
         if (currentStep === 0) return 0;
         if (currentStep === 1) return 2;
@@ -140,14 +154,20 @@ const BookingWizard = ({
       switch (logicalStep) {
         case 0: return selectedDate !== null;
         case 1: return selectedTime !== null;
-        case 2: return selectedLocation !== null;
+        case 2: 
+          // For custom mode, require custom location text
+          if (platformMode === "custom") return customLocation.trim() !== "";
+          return selectedLocation !== null;
         case 3: return formData.email.trim() !== "";
         default: return false;
       }
     } else {
       // Desktop: step 0 needs both date and time
       if (logicalStep === 0) return selectedDate !== null && selectedTime !== null;
-      if (logicalStep === 2) return selectedLocation !== null;
+      if (logicalStep === 2) {
+        if (platformMode === "custom") return customLocation.trim() !== "";
+        return selectedLocation !== null;
+      }
       if (logicalStep === 3) return formData.email.trim() !== "";
       return false;
     }
@@ -170,7 +190,7 @@ const BookingWizard = ({
   const handleSubmit = () => {
     toast({
       title: isRescheduling ? "Meeting Rescheduled!" : "Meeting Booked!",
-      description: `Your meeting has been ${isRescheduling ? "rescheduled" : "confirmed"} for ${selectedDate?.toLocaleDateString()} at ${selectedTime} via ${LOCATION_NAMES[selectedLocation]}.`,
+      description: `Your meeting has been ${isRescheduling ? "rescheduled" : "confirmed"} for ${selectedDate?.toLocaleDateString()} at ${selectedTime} via ${getLocationDisplay()}.`,
     });
     onComplete?.();
   };
@@ -227,13 +247,34 @@ const BookingWizard = ({
         "font-semibold text-foreground text-center",
         isMobile ? "text-lg mb-3" : "text-xl mb-6"
       )}>
-        Choose meeting platform
+        {platformMode === "custom" ? "Enter meeting location" : "Choose meeting platform"}
       </h2>
-      <LocationSelector
-        selected={selectedLocation}
-        onChange={setSelectedLocation}
-        compact={isMobile}
-      />
+      
+      {platformMode === "custom" ? (
+        <div className={cn("w-full", isMobile ? "max-w-xs" : "max-w-md")}>
+          <div className="space-y-2">
+            <Label htmlFor="customLocation" className={isMobile ? "text-xs" : undefined}>
+              Meeting link or location
+            </Label>
+            <Input
+              id="customLocation"
+              placeholder="https://meet.example.com/abc or Room 101"
+              value={customLocation}
+              onChange={(e) => setCustomLocation(e.target.value)}
+              className={isMobile ? "h-10 text-sm" : "h-12"}
+            />
+            <p className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-xs")}>
+              Enter a video call link, phone number, or physical address
+            </p>
+          </div>
+        </div>
+      ) : (
+        <LocationSelector
+          selected={selectedLocation}
+          onChange={setSelectedLocation}
+          compact={isMobile}
+        />
+      )}
     </div>
   );
 
@@ -261,7 +302,7 @@ const BookingWizard = ({
         </div>
         <div className={cn("flex items-center gap-2", isMobile ? "text-xs" : "text-sm")}>
           <MapPin className={cn("text-primary", isMobile ? "w-3 h-3" : "w-4 h-4")} />
-          <span>{LOCATION_NAMES[selectedLocation]}</span>
+          <span className="truncate">{getLocationDisplay()}</span>
         </div>
         <div className={cn("flex items-center gap-2", isMobile ? "text-xs" : "text-sm")}>
           <User className={cn("text-primary", isMobile ? "w-3 h-3" : "w-4 h-4")} />

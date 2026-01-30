@@ -4,7 +4,7 @@ import BookingWizard from "@/components/booking/BookingWizard";
 import AttendeeView from "@/components/booking/AttendeeView";
 import EmailPreview from "@/components/booking/EmailPreview";
 import TooLateToModify from "@/components/booking/TooLateToModify";
-import ViewSwitcher, { ViewMode } from "@/components/booking/ViewSwitcher";
+import ViewSwitcher, { ViewMode, PlatformMode } from "@/components/booking/ViewSwitcher";
 import MobileFrame from "@/components/booking/MobileFrame";
 
 const Index = () => {
@@ -12,7 +12,7 @@ const Index = () => {
   const [isRescheduling, setIsRescheduling] = useState(false);
   const [tooLateAction, setTooLateAction] = useState<"reschedule" | "cancel">("reschedule");
   const [isMobilePreview, setIsMobilePreview] = useState(false);
-  const [showPlatformSelection, setShowPlatformSelection] = useState(true);
+  const [platformMode, setPlatformMode] = useState<PlatformMode>("full");
 
   const handleReschedule = () => {
     setIsRescheduling(true);
@@ -30,7 +30,7 @@ const Index = () => {
         <BookingWizard 
           isRescheduling={true} 
           isMobilePreview={isMobilePreview}
-          showPlatformSelection={showPlatformSelection}
+          platformMode={platformMode}
           onComplete={handleRescheduleComplete}
         />
       );
@@ -41,14 +41,14 @@ const Index = () => {
         return (
           <BookingWidget 
             isMobilePreview={isMobilePreview} 
-            location={showPlatformSelection ? "Zoom" : "Microsoft Teams"}
+            location={platformMode === "disabled" ? "Microsoft Teams" : undefined}
           />
         );
       case "organizer-wizard":
         return (
           <BookingWizard 
             isMobilePreview={isMobilePreview} 
-            showPlatformSelection={showPlatformSelection}
+            platformMode={platformMode}
           />
         );
       case "attendee":
@@ -63,7 +63,7 @@ const Index = () => {
           />
         );
       default:
-        return <BookingWizard showPlatformSelection={showPlatformSelection} />;
+        return <BookingWizard platformMode={platformMode} />;
     }
   };
 
@@ -80,8 +80,8 @@ const Index = () => {
         }}
         isMobilePreview={isMobilePreview}
         onMobilePreviewChange={setIsMobilePreview}
-        showPlatformSelection={showPlatformSelection}
-        onPlatformSelectionChange={setShowPlatformSelection}
+        platformMode={platformMode}
+        onPlatformModeChange={setPlatformMode}
       />
       <MobileFrame enabled={shouldUseMobileFrame}>
         {renderView()}

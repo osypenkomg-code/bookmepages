@@ -1,17 +1,17 @@
 import { cn } from "@/lib/utils";
 import { Mail, Clock, Smartphone, Monitor, Settings2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 export type ViewMode = "organizer-classic" | "organizer-wizard" | "attendee" | "email-preview" | "too-late";
+export type PlatformMode = "full" | "custom" | "disabled";
 
 interface ViewSwitcherProps {
   currentView: ViewMode;
   onChange: (view: ViewMode) => void;
   isMobilePreview?: boolean;
   onMobilePreviewChange?: (enabled: boolean) => void;
-  showPlatformSelection?: boolean;
-  onPlatformSelectionChange?: (enabled: boolean) => void;
+  platformMode?: PlatformMode;
+  onPlatformModeChange?: (mode: PlatformMode) => void;
 }
 
 const views: { id: ViewMode; label: string; description: string; icon?: React.ReactNode }[] = [
@@ -22,13 +22,19 @@ const views: { id: ViewMode; label: string; description: string; icon?: React.Re
   { id: "too-late", label: "Too Late", description: "Cutoff time reached", icon: <Clock className="w-4 h-4" /> },
 ];
 
+const platformModes: { id: PlatformMode; label: string; description: string }[] = [
+  { id: "full", label: "Full", description: "Choose Zoom, Teams, or Google Meet" },
+  { id: "custom", label: "Custom", description: "Enter custom meeting link" },
+  { id: "disabled", label: "Off", description: "Skip platform step (default Teams)" },
+];
+
 const ViewSwitcher = ({ 
   currentView, 
   onChange, 
   isMobilePreview = false, 
   onMobilePreviewChange,
-  showPlatformSelection = true,
-  onPlatformSelectionChange,
+  platformMode = "full",
+  onPlatformModeChange,
 }: ViewSwitcherProps) => {
   const isOrganizerView = currentView === "organizer-classic" || currentView === "organizer-wizard";
 
@@ -54,7 +60,7 @@ const ViewSwitcher = ({
         ))}
       </div>
 
-      {/* Settings Row: Mobile Preview + Platform Selection */}
+      {/* Settings Row: Mobile Preview + Platform Mode */}
       <div className="flex gap-2">
         {/* Mobile Preview Toggle */}
         {onMobilePreviewChange && (
@@ -75,19 +81,28 @@ const ViewSwitcher = ({
           </div>
         )}
 
-        {/* Platform Selection Toggle - Only show for organizer views */}
-        {isOrganizerView && onPlatformSelectionChange && (
-          <div className="bg-card border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+        {/* Platform Mode Selector - Only show for organizer views */}
+        {isOrganizerView && onPlatformModeChange && (
+          <div className="bg-card border border-border rounded-full px-3 py-1.5 shadow-lg flex items-center gap-2">
             <Settings2 className="w-4 h-4 text-muted-foreground" />
-            <Label htmlFor="platform-toggle" className="text-xs font-medium text-muted-foreground cursor-pointer">
-              Platform step
-            </Label>
-            <Switch
-              id="platform-toggle"
-              checked={showPlatformSelection}
-              onCheckedChange={onPlatformSelectionChange}
-              className="scale-90"
-            />
+            <span className="text-xs font-medium text-muted-foreground">Platform:</span>
+            <div className="flex gap-1">
+              {platformModes.map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => onPlatformModeChange(mode.id)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200",
+                    platformMode === mode.id
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                  title={mode.description}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
