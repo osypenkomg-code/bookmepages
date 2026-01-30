@@ -194,13 +194,17 @@ const BookingWizard = ({
   );
 
   const renderPlatformStep = () => (
-    <div className="flex flex-col items-center px-2">
-      <h2 className="text-xl font-semibold text-foreground mb-6">
+    <div className="flex flex-col items-center px-2 w-full">
+      <h2 className={cn(
+        "font-semibold text-foreground text-center",
+        isMobile ? "text-lg mb-3" : "text-xl mb-6"
+      )}>
         Choose meeting platform
       </h2>
       <LocationSelector
         selected={selectedLocation}
         onChange={setSelectedLocation}
+        compact={isMobile}
       />
     </div>
   );
