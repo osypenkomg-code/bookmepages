@@ -371,7 +371,7 @@ const BookingWizard = ({
       <div className="flex-1 flex items-center justify-center p-4 md:p-8 mt-12">
         <div className="bg-card rounded-2xl shadow-lg border border-border w-full max-w-2xl overflow-hidden">
           <div className="p-6 md:p-10">
-            <StepIndicator steps={steps} currentStep={currentStep} />
+            <StepIndicator steps={steps} currentStep={currentStep} compact={isMobile} />
             
             <div className="min-h-[400px] flex items-center justify-center">
               {renderStepContent()}
