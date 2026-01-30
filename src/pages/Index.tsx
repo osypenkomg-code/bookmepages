@@ -40,7 +40,7 @@ const Index = () => {
       case "organizer-wizard":
         return <BookingWizard isMobilePreview={isMobilePreview} />;
       case "attendee":
-        return <AttendeeView onReschedule={handleReschedule} />;
+        return <AttendeeView onReschedule={handleReschedule} isMobilePreview={isMobilePreview} />;
       case "email-preview":
         return <EmailPreview isMobilePreview={isMobilePreview} />;
       case "too-late":

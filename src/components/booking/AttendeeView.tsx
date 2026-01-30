@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin, User, CalendarX, RefreshCw, ChevronRight } from "lucide-react";
+import { Calendar, Clock, MapPin, User, CalendarX, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import RevenuegridLogo from "@/assets/revenuegrid-logo.svg";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface BookingDetails {
   title: string;
@@ -31,6 +32,7 @@ interface BookingDetails {
 interface AttendeeViewProps {
   booking?: BookingDetails;
   onReschedule: () => void;
+  isMobilePreview?: boolean;
 }
 
 const defaultBooking: BookingDetails = {
@@ -46,7 +48,14 @@ const defaultBooking: BookingDetails = {
   attendeeEmail: "john.doe@example.com",
 };
 
-const formatDate = (date: Date) => {
+const formatDate = (date: Date, compact = false) => {
+  if (compact) {
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  }
   return date.toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
@@ -55,10 +64,13 @@ const formatDate = (date: Date) => {
   });
 };
 
-const AttendeeView = ({ booking = defaultBooking, onReschedule }: AttendeeViewProps) => {
+const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview = false }: AttendeeViewProps) => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
+  
+  const isMobileHook = useIsMobile();
+  const isMobile = isMobilePreview || isMobileHook;
 
   const cancelReasons = [
     "Schedule conflict",
@@ -91,97 +103,136 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule }: AttendeeViewPr
   return (
     <div className="min-h-screen bg-muted flex flex-col">
       {/* Header */}
-      <header className="py-4 px-6 flex items-center justify-between border-b border-border bg-card">
-        <img src={RevenuegridLogo} alt="Revenue Grid" className="h-7" />
+      <header className={cn(
+        "px-4 flex items-center justify-between border-b border-border bg-card",
+        isMobile ? "py-2" : "py-4 px-6"
+      )}>
+        <img src={RevenuegridLogo} alt="Revenue Grid" className={isMobile ? "h-5" : "h-7"} />
         <div className="text-right">
-          <p className="text-sm font-medium text-foreground">Your Booking</p>
-          <p className="text-xs text-muted-foreground">{booking.attendeeEmail}</p>
+          <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>Your Booking</p>
+          <p className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-xs")}>{booking.attendeeEmail}</p>
         </div>
       </header>
 
-      <div className="flex-1 flex items-center justify-center p-4 md:p-8 mt-12">
-        <div className="bg-card rounded-2xl shadow-lg border border-border w-full max-w-xl overflow-hidden">
-          <div className="p-6 md:p-10">
+      <div className={cn(
+        "flex-1 flex items-start justify-center",
+        isMobile ? "p-2 pt-2" : "p-4 md:p-8 mt-12"
+      )}>
+        <div className={cn(
+          "bg-card rounded-2xl shadow-lg border border-border w-full max-w-xl overflow-hidden",
+          isMobile && "rounded-xl"
+        )}>
+          <div className={cn(isMobile ? "p-3" : "p-6 md:p-10")}>
             {/* Status Badge */}
-            <div className="flex justify-center mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <div className={cn("flex justify-center", isMobile ? "mb-2" : "mb-6")}>
+              <span className={cn(
+                "inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-700 font-medium",
+                isMobile ? "px-2.5 py-1 text-xs" : "px-4 py-2 text-sm gap-2"
+              )}>
+                <span className={cn("rounded-full bg-green-500 animate-pulse", isMobile ? "w-1.5 h-1.5" : "w-2 h-2")}></span>
                 Confirmed
               </span>
             </div>
 
-            <h1 className="text-2xl font-semibold text-foreground text-center mb-2">
+            <h1 className={cn(
+              "font-semibold text-foreground text-center",
+              isMobile ? "text-lg mb-1" : "text-2xl mb-2"
+            )}>
               {booking.title}
             </h1>
-            <p className="text-center text-muted-foreground mb-8">
+            <p className={cn(
+              "text-center text-muted-foreground",
+              isMobile ? "text-xs mb-3" : "mb-8"
+            )}>
               Your meeting is scheduled
             </p>
 
             {/* Booking Details */}
-            <div className="bg-secondary/50 rounded-xl p-6 mb-8 space-y-4">
-              <div className="flex items-start gap-4">
-                <Calendar className="w-5 h-5 text-primary mt-0.5" />
+            <div className={cn(
+              "bg-secondary/50 rounded-xl",
+              isMobile ? "p-3 mb-3 space-y-2" : "p-6 mb-8 space-y-4"
+            )}>
+              <div className={cn("flex items-start", isMobile ? "gap-2" : "gap-4")}>
+                <Calendar className={cn("text-primary mt-0.5", isMobile ? "w-4 h-4" : "w-5 h-5")} />
+                <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>
+                  {formatDate(booking.date, isMobile)}
+                </p>
+              </div>
+
+              <div className={cn("flex items-start", isMobile ? "gap-2" : "gap-4")}>
+                <Clock className={cn("text-primary mt-0.5", isMobile ? "w-4 h-4" : "w-5 h-5")} />
                 <div>
-                  <p className="font-medium text-foreground">{formatDate(booking.date)}</p>
+                  <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>
+                    {booking.time} ({booking.duration})
+                  </p>
+                  {!isMobile && (
+                    <p className="text-sm text-muted-foreground">{booking.timezone}</p>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <Clock className="w-5 h-5 text-primary mt-0.5" />
+              <div className={cn("flex items-start", isMobile ? "gap-2" : "gap-4")}>
+                <MapPin className={cn("text-primary mt-0.5", isMobile ? "w-4 h-4" : "w-5 h-5")} />
                 <div>
-                  <p className="font-medium text-foreground">{booking.time} ({booking.duration})</p>
-                  <p className="text-sm text-muted-foreground">{booking.timezone}</p>
+                  <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>{booking.location}</p>
+                  {!isMobile && (
+                    <p className="text-sm text-muted-foreground">Meeting link will be sent via email</p>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <MapPin className="w-5 h-5 text-primary mt-0.5" />
+              <div className={cn("flex items-start", isMobile ? "gap-2" : "gap-4")}>
+                <User className={cn("text-primary mt-0.5", isMobile ? "w-4 h-4" : "w-5 h-5")} />
                 <div>
-                  <p className="font-medium text-foreground">{booking.location}</p>
-                  <p className="text-sm text-muted-foreground">Meeting link will be sent via email</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <User className="w-5 h-5 text-primary mt-0.5" />
-                <div>
-                  <p className="font-medium text-foreground">{booking.organizerName}</p>
-                  <p className="text-sm text-muted-foreground">{booking.organizerEmail}</p>
+                  <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>{booking.organizerName}</p>
+                  {!isMobile && (
+                    <p className="text-sm text-muted-foreground">{booking.organizerEmail}</p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className={cn("grid grid-cols-2", isMobile ? "gap-2" : "gap-4")}>
               <Button
                 variant="outline"
                 onClick={handleReschedule}
-                className="h-14 flex items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5"
+                className={cn(
+                  "flex items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5",
+                  isMobile ? "h-10 text-xs" : "h-14"
+                )}
               >
-                <RefreshCw className="w-5 h-5" />
+                <RefreshCw className={isMobile ? "w-4 h-4" : "w-5 h-5"} />
                 <span>Reschedule</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowCancelDialog(true)}
-                className="h-14 flex items-center justify-center gap-2 border-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive"
+                className={cn(
+                  "flex items-center justify-center gap-2 border-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive",
+                  isMobile ? "h-10 text-xs" : "h-14"
+                )}
               >
-                <CalendarX className="w-5 h-5" />
+                <CalendarX className={isMobile ? "w-4 h-4" : "w-5 h-5"} />
                 <span>Cancel</span>
               </Button>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center mt-6">
-              Need to make changes? Reschedule or cancel anytime before the meeting.
-            </p>
+            {!isMobile && (
+              <p className="text-xs text-muted-foreground text-center mt-6">
+                Need to make changes? Reschedule or cancel anytime before the meeting.
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="py-4 text-center text-sm text-muted-foreground border-t border-border bg-card">
-        © 2026 RevenueGrid.com. All Rights Reserved.
-      </footer>
+      {/* Footer - hidden on mobile */}
+      {!isMobile && (
+        <footer className="py-4 text-center text-sm text-muted-foreground border-t border-border bg-card">
+          © 2026 RevenueGrid.com. All Rights Reserved.
+        </footer>
+      )}
 
       {/* Cancel Dialog */}
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
