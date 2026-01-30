@@ -363,7 +363,7 @@ const BookingWizard = ({
 
   return (
     <div className="min-h-screen bg-muted flex flex-col">
-      {/* Header - more compact on mobile */}
+      {/* Header - compact on mobile with meeting info */}
       <header className={cn(
         "px-4 flex items-center justify-between border-b border-border bg-card",
         isMobile ? "py-2" : "py-4 px-6"
@@ -378,25 +378,23 @@ const BookingWizard = ({
               Rescheduling
             </span>
           )}
-          {!isMobile && (
-            <div className="text-right">
-              <p className="text-sm font-medium text-foreground">{title}</p>
-              <p className="text-xs text-muted-foreground">{duration} • {organizerEmail}</p>
-            </div>
-          )}
+          <div className="text-right">
+            <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>{title}</p>
+            <p className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-xs")}>{duration} • {organizerEmail}</p>
+          </div>
         </div>
       </header>
 
       <div className={cn(
-        "flex-1 flex items-center justify-center",
-        isMobile ? "p-2 pt-3" : "p-4 md:p-8 mt-12"
+        "flex-1 flex items-start justify-center",
+        isMobile ? "p-2 pt-2" : "p-4 md:p-8 mt-12"
       )}>
         <div className={cn(
           "bg-card rounded-2xl shadow-lg border border-border w-full max-w-2xl overflow-hidden",
           isMobile && "rounded-xl"
         )}>
           <div className={cn(
-            isMobile ? "p-4" : "p-6 md:p-10"
+            isMobile ? "p-3" : "p-6 md:p-10"
           )}>
             <StepIndicator steps={steps} currentStep={currentStep} compact={isMobile} />
             
