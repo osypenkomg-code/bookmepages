@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
-import { Mail, Clock, Smartphone, Monitor } from "lucide-react";
+import { Mail, Clock, Smartphone, Monitor, Settings2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export type ViewMode = "organizer-classic" | "organizer-wizard" | "attendee" | "email-preview" | "too-late";
 
@@ -9,6 +10,8 @@ interface ViewSwitcherProps {
   onChange: (view: ViewMode) => void;
   isMobilePreview?: boolean;
   onMobilePreviewChange?: (enabled: boolean) => void;
+  showPlatformSelection?: boolean;
+  onPlatformSelectionChange?: (enabled: boolean) => void;
 }
 
 const views: { id: ViewMode; label: string; description: string; icon?: React.ReactNode }[] = [
@@ -19,7 +22,16 @@ const views: { id: ViewMode; label: string; description: string; icon?: React.Re
   { id: "too-late", label: "Too Late", description: "Cutoff time reached", icon: <Clock className="w-4 h-4" /> },
 ];
 
-const ViewSwitcher = ({ currentView, onChange, isMobilePreview = false, onMobilePreviewChange }: ViewSwitcherProps) => {
+const ViewSwitcher = ({ 
+  currentView, 
+  onChange, 
+  isMobilePreview = false, 
+  onMobilePreviewChange,
+  showPlatformSelection = true,
+  onPlatformSelectionChange,
+}: ViewSwitcherProps) => {
+  const isOrganizerView = currentView === "organizer-classic" || currentView === "organizer-wizard";
+
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
       {/* View Tabs */}
@@ -42,24 +54,43 @@ const ViewSwitcher = ({ currentView, onChange, isMobilePreview = false, onMobile
         ))}
       </div>
 
-      {/* Mobile Preview Toggle */}
-      {onMobilePreviewChange && (
-        <div className="bg-card border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Monitor className={cn("w-4 h-4", !isMobilePreview && "text-primary")} />
-            <span className={cn("text-xs font-medium", !isMobilePreview && "text-foreground")}>Desktop</span>
+      {/* Settings Row: Mobile Preview + Platform Selection */}
+      <div className="flex gap-2">
+        {/* Mobile Preview Toggle */}
+        {onMobilePreviewChange && (
+          <div className="bg-card border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Monitor className={cn("w-4 h-4", !isMobilePreview && "text-primary")} />
+              <span className={cn("text-xs font-medium", !isMobilePreview && "text-foreground")}>Desktop</span>
+            </div>
+            <Switch
+              checked={isMobilePreview}
+              onCheckedChange={onMobilePreviewChange}
+              className="scale-90"
+            />
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Smartphone className={cn("w-4 h-4", isMobilePreview && "text-primary")} />
+              <span className={cn("text-xs font-medium", isMobilePreview && "text-foreground")}>Mobile</span>
+            </div>
           </div>
-          <Switch
-            checked={isMobilePreview}
-            onCheckedChange={onMobilePreviewChange}
-            className="scale-90"
-          />
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Smartphone className={cn("w-4 h-4", isMobilePreview && "text-primary")} />
-            <span className={cn("text-xs font-medium", isMobilePreview && "text-foreground")}>Mobile</span>
+        )}
+
+        {/* Platform Selection Toggle - Only show for organizer views */}
+        {isOrganizerView && onPlatformSelectionChange && (
+          <div className="bg-card border border-border rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+            <Settings2 className="w-4 h-4 text-muted-foreground" />
+            <Label htmlFor="platform-toggle" className="text-xs font-medium text-muted-foreground cursor-pointer">
+              Platform step
+            </Label>
+            <Switch
+              id="platform-toggle"
+              checked={showPlatformSelection}
+              onCheckedChange={onPlatformSelectionChange}
+              className="scale-90"
+            />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

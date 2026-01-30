@@ -19,20 +19,6 @@ interface BookingFormData {
   notes: string;
 }
 
-interface BookingWizardProps {
-  title?: string;
-  duration?: string;
-  organizerName?: string;
-  organizerEmail?: string;
-  timezone?: string;
-  isRescheduling?: boolean;
-  isMobilePreview?: boolean;
-  onComplete?: () => void;
-}
-
-const DESKTOP_STEPS = ["Date & Time", "Platform", "Details"];
-const MOBILE_STEPS = ["Date", "Time", "Platform", "Details"];
-
 const TIME_SLOTS = [
   { time: "09:00 AM", available: true },
   { time: "09:30 AM", available: true },
@@ -53,6 +39,18 @@ const LOCATION_NAMES: Record<LocationType, string> = {
   "google-meet": "Google Meet",
 };
 
+interface BookingWizardProps {
+  title?: string;
+  duration?: string;
+  organizerName?: string;
+  organizerEmail?: string;
+  timezone?: string;
+  isRescheduling?: boolean;
+  isMobilePreview?: boolean;
+  showPlatformSelection?: boolean;
+  onComplete?: () => void;
+}
+
 const BookingWizard = ({
   title = "Test BookMe shortening #1",
   duration = "30min",
@@ -61,6 +59,7 @@ const BookingWizard = ({
   timezone = "(UTC +02:00) Kyiv",
   isRescheduling = false,
   isMobilePreview = false,
+  showPlatformSelection = true,
   onComplete,
 }: BookingWizardProps) => {
   // Auto-select today or next available date (27th for demo)
@@ -78,12 +77,29 @@ const BookingWizard = ({
   const isMobileHook = useIsMobile();
   // Use prop override if set, otherwise fall back to hook
   const isMobile = isMobilePreview || isMobileHook;
-  const steps = isMobile ? MOBILE_STEPS : DESKTOP_STEPS;
+  
+  // Define steps based on device and platform selection setting
+  const getSteps = () => {
+    if (isMobile) {
+      return showPlatformSelection 
+        ? ["Date", "Time", "Platform", "Details"]
+        : ["Date", "Time", "Details"];
+    } else {
+      return showPlatformSelection 
+        ? ["Date & Time", "Platform", "Details"]
+        : ["Date & Time", "Details"];
+    }
+  };
+  
+  const steps = getSteps();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | null>(getInitialDate());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<LocationType>("zoom");
+  // Default to Teams when platform selection is disabled
+  const [selectedLocation, setSelectedLocation] = useState<LocationType>(
+    showPlatformSelection ? "zoom" : "teams"
+  );
   const [formData, setFormData] = useState<BookingFormData>({
     fullName: isRescheduling ? "John Doe" : "",
     email: isRescheduling ? "john.doe@example.com" : "",
@@ -91,16 +107,30 @@ const BookingWizard = ({
     notes: "",
   });
 
-  // Map current step to logical step based on device
+  // Map current step to logical step based on device and platform selection
   const getLogicalStep = () => {
     if (isMobile) {
-      // Mobile: 0=Date, 1=Time, 2=Platform, 3=Details
-      return currentStep;
+      if (showPlatformSelection) {
+        // Mobile with platform: 0=Date, 1=Time, 2=Platform, 3=Details
+        return currentStep;
+      } else {
+        // Mobile without platform: 0=Date, 1=Time, 2=Details
+        // Map to logical: 0, 1, 3 (skip 2)
+        if (currentStep === 0) return 0;
+        if (currentStep === 1) return 1;
+        return 3;
+      }
     } else {
-      // Desktop: 0=Date&Time, 1=Platform, 2=Details → map to 0, 2, 3
-      if (currentStep === 0) return 0; // Date & Time
-      if (currentStep === 1) return 2; // Platform
-      return 3; // Details
+      if (showPlatformSelection) {
+        // Desktop with platform: 0=Date&Time, 1=Platform, 2=Details → map to 0, 2, 3
+        if (currentStep === 0) return 0;
+        if (currentStep === 1) return 2;
+        return 3;
+      } else {
+        // Desktop without platform: 0=Date&Time, 1=Details → map to 0, 3
+        if (currentStep === 0) return 0;
+        return 3;
+      }
     }
   };
 
@@ -116,12 +146,10 @@ const BookingWizard = ({
       }
     } else {
       // Desktop: step 0 needs both date and time
-      switch (currentStep) {
-        case 0: return selectedDate !== null && selectedTime !== null;
-        case 1: return selectedLocation !== null;
-        case 2: return formData.email.trim() !== "";
-        default: return false;
-      }
+      if (logicalStep === 0) return selectedDate !== null && selectedTime !== null;
+      if (logicalStep === 2) return selectedLocation !== null;
+      if (logicalStep === 3) return formData.email.trim() !== "";
+      return false;
     }
   };
 
