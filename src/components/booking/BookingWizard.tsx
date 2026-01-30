@@ -41,6 +41,12 @@ const LOCATION_NAMES: Record<LocationType, string> = {
 
 export type PlatformMode = "full" | "custom" | "disabled";
 
+export interface EnabledPlatforms {
+  zoom: boolean;
+  teams: boolean;
+  googleMeet: boolean;
+}
+
 interface BookingWizardProps {
   title?: string;
   duration?: string;
@@ -50,6 +56,7 @@ interface BookingWizardProps {
   isRescheduling?: boolean;
   isMobilePreview?: boolean;
   platformMode?: PlatformMode;
+  enabledPlatforms?: EnabledPlatforms;
   onComplete?: () => void;
 }
 
@@ -62,6 +69,7 @@ const BookingWizard = ({
   isRescheduling = false,
   isMobilePreview = false,
   platformMode = "full",
+  enabledPlatforms = { zoom: true, teams: true, googleMeet: true },
   onComplete,
 }: BookingWizardProps) => {
   // Auto-select today or next available date (27th for demo)
@@ -273,6 +281,7 @@ const BookingWizard = ({
           selected={selectedLocation}
           onChange={setSelectedLocation}
           compact={isMobile}
+          enabledPlatforms={enabledPlatforms}
         />
       )}
     </div>
