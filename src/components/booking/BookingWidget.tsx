@@ -14,6 +14,7 @@ interface BookingWidgetProps {
   organizerEmail?: string;
   timezone?: string;
   isRescheduling?: boolean;
+  isMobilePreview?: boolean;
   onComplete?: () => void;
 }
 
@@ -25,6 +26,7 @@ const BookingWidget = ({
   organizerEmail = "maksym.osypenko@revenuegrid.com",
   timezone = "(UTC +02:00) Kyiv",
   isRescheduling = false,
+  isMobilePreview = false,
   onComplete,
 }: BookingWidgetProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2026, 0, 27));
@@ -59,6 +61,7 @@ const BookingWidget = ({
         timezone={timezone}
         organizerName={organizerName}
         organizerEmail={organizerEmail}
+        isMobilePreview={isMobilePreview}
         onBack={handleBack}
         onConfirm={handleConfirm}
       />
@@ -88,7 +91,7 @@ const BookingWidget = ({
               organizerEmail={organizerEmail}
             />
             
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 mt-8">
+            <div className={`grid gap-8 mt-8 ${isMobilePreview ? 'grid-cols-1' : 'md:grid-cols-2 md:gap-12'}`}>
               {/* Calendar Section */}
               <div className="flex justify-center">
                 <BookingCalendar
@@ -98,7 +101,7 @@ const BookingWidget = ({
               </div>
               
               {/* Time Slots Section */}
-              <div className="flex justify-center md:justify-start">
+              <div className={`flex justify-center ${isMobilePreview ? '' : 'md:justify-start'}`}>
                 <TimeSlotPicker
                   selectedDate={selectedDate}
                   selectedTime={selectedTime}

@@ -35,7 +35,7 @@ const Index = () => {
 
     switch (viewMode) {
       case "organizer-classic":
-        return <BookingWidget />;
+        return <BookingWidget isMobilePreview={isMobilePreview} />;
       case "organizer-wizard":
         return <BookingWizard />;
       case "attendee":
