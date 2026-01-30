@@ -3,10 +3,17 @@ import { Check } from "lucide-react";
 
 export type LocationType = "zoom" | "teams" | "google-meet";
 
+export interface EnabledPlatforms {
+  zoom: boolean;
+  teams: boolean;
+  googleMeet: boolean;
+}
+
 interface LocationSelectorProps {
-  selected: LocationType;
+  selected: LocationType | null;
   onChange: (location: LocationType) => void;
   compact?: boolean;
+  enabledPlatforms?: EnabledPlatforms;
 }
 
 const locations: { 
@@ -64,13 +71,34 @@ const locations: {
   },
 ];
 
-const LocationSelector = ({ selected, onChange, compact = false }: LocationSelectorProps) => {
-  const selectedLocation = locations.find(loc => loc.id === selected);
+const LocationSelector = ({ 
+  selected, 
+  onChange, 
+  compact = false,
+  enabledPlatforms = { zoom: true, teams: true, googleMeet: true }
+}: LocationSelectorProps) => {
+  // Map LocationType to EnabledPlatforms keys
+  const platformKeyMap: Record<LocationType, keyof EnabledPlatforms> = {
+    zoom: "zoom",
+    teams: "teams",
+    "google-meet": "googleMeet",
+  };
+  
+  // Filter locations based on enabled platforms
+  const filteredLocations = locations.filter(loc => enabledPlatforms[platformKeyMap[loc.id]]);
+  const selectedLocation = filteredLocations.find(loc => loc.id === selected);
+  
+  // Dynamic grid columns based on number of enabled platforms
+  const gridCols = filteredLocations.length === 1 
+    ? "grid-cols-1" 
+    : filteredLocations.length === 2 
+      ? "grid-cols-2" 
+      : "grid-cols-3";
 
   return (
     <div className={cn("flex flex-col", compact ? "gap-3" : "gap-5")}>
-      <div className={cn("grid grid-cols-3", compact ? "gap-2" : "gap-4")}>
-        {locations.map((loc) => (
+      <div className={cn("grid", gridCols, compact ? "gap-2" : "gap-4")}>
+        {filteredLocations.map((loc) => (
           <button
             key={loc.id}
             onClick={() => onChange(loc.id)}

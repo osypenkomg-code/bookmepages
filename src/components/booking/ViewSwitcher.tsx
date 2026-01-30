@@ -1,9 +1,16 @@
 import { cn } from "@/lib/utils";
 import { Mail, Clock, Smartphone, Monitor, Settings2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export type ViewMode = "organizer-classic" | "organizer-wizard" | "attendee" | "email-preview" | "too-late";
 export type PlatformMode = "full" | "custom" | "disabled";
+
+export interface EnabledPlatforms {
+  zoom: boolean;
+  teams: boolean;
+  googleMeet: boolean;
+}
 
 interface ViewSwitcherProps {
   currentView: ViewMode;
@@ -12,6 +19,8 @@ interface ViewSwitcherProps {
   onMobilePreviewChange?: (enabled: boolean) => void;
   platformMode?: PlatformMode;
   onPlatformModeChange?: (mode: PlatformMode) => void;
+  enabledPlatforms?: EnabledPlatforms;
+  onEnabledPlatformsChange?: (platforms: EnabledPlatforms) => void;
 }
 
 const views: { id: ViewMode; label: string; description: string; icon?: React.ReactNode }[] = [
@@ -28,6 +37,12 @@ const platformModes: { id: PlatformMode; label: string; description: string }[] 
   { id: "disabled", label: "Off", description: "Skip platform step (default Teams)" },
 ];
 
+const platformOptions: { key: keyof EnabledPlatforms; label: string }[] = [
+  { key: "zoom", label: "Zoom" },
+  { key: "teams", label: "Teams" },
+  { key: "googleMeet", label: "Meet" },
+];
+
 const ViewSwitcher = ({ 
   currentView, 
   onChange, 
@@ -35,8 +50,19 @@ const ViewSwitcher = ({
   onMobilePreviewChange,
   platformMode = "full",
   onPlatformModeChange,
+  enabledPlatforms = { zoom: true, teams: true, googleMeet: true },
+  onEnabledPlatformsChange,
 }: ViewSwitcherProps) => {
   const isOrganizerView = currentView === "organizer-classic" || currentView === "organizer-wizard";
+  
+  const handlePlatformToggle = (key: keyof EnabledPlatforms) => {
+    if (!onEnabledPlatformsChange) return;
+    const newPlatforms = { ...enabledPlatforms, [key]: !enabledPlatforms[key] };
+    // Ensure at least one platform remains enabled
+    const enabledCount = Object.values(newPlatforms).filter(Boolean).length;
+    if (enabledCount === 0) return;
+    onEnabledPlatformsChange(newPlatforms);
+  };
 
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
@@ -103,6 +129,28 @@ const ViewSwitcher = ({
                 </button>
               ))}
             </div>
+            
+            {/* Platform enable/disable toggles - only show in Full mode */}
+            {platformMode === "full" && onEnabledPlatformsChange && (
+              <>
+                <div className="w-px h-4 bg-border mx-1" />
+                <div className="flex items-center gap-2">
+                  {platformOptions.map((platform) => (
+                    <label
+                      key={platform.key}
+                      className="flex items-center gap-1 cursor-pointer"
+                    >
+                      <Checkbox
+                        checked={enabledPlatforms[platform.key]}
+                        onCheckedChange={() => handlePlatformToggle(platform.key)}
+                        className="w-3.5 h-3.5"
+                      />
+                      <span className="text-xs text-muted-foreground">{platform.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

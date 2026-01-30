@@ -4,7 +4,7 @@ import BookingWizard from "@/components/booking/BookingWizard";
 import AttendeeView from "@/components/booking/AttendeeView";
 import EmailPreview from "@/components/booking/EmailPreview";
 import TooLateToModify from "@/components/booking/TooLateToModify";
-import ViewSwitcher, { ViewMode, PlatformMode } from "@/components/booking/ViewSwitcher";
+import ViewSwitcher, { ViewMode, PlatformMode, EnabledPlatforms } from "@/components/booking/ViewSwitcher";
 import MobileFrame from "@/components/booking/MobileFrame";
 
 const Index = () => {
@@ -13,7 +13,11 @@ const Index = () => {
   const [tooLateAction, setTooLateAction] = useState<"reschedule" | "cancel">("reschedule");
   const [isMobilePreview, setIsMobilePreview] = useState(false);
   const [platformMode, setPlatformMode] = useState<PlatformMode>("full");
-
+  const [enabledPlatforms, setEnabledPlatforms] = useState<EnabledPlatforms>({
+    zoom: true,
+    teams: true,
+    googleMeet: true,
+  });
   const handleReschedule = () => {
     setIsRescheduling(true);
   };
@@ -49,6 +53,7 @@ const Index = () => {
           <BookingWizard 
             isMobilePreview={isMobilePreview} 
             platformMode={platformMode}
+            enabledPlatforms={enabledPlatforms}
           />
         );
       case "attendee":
@@ -82,6 +87,8 @@ const Index = () => {
         onMobilePreviewChange={setIsMobilePreview}
         platformMode={platformMode}
         onPlatformModeChange={setPlatformMode}
+        enabledPlatforms={enabledPlatforms}
+        onEnabledPlatformsChange={setEnabledPlatforms}
       />
       <MobileFrame enabled={shouldUseMobileFrame}>
         {renderView()}
