@@ -28,7 +28,7 @@ interface BookingWizardProps {
   onComplete?: () => void;
 }
 
-const STEPS = ["Date & Time", "Platform", "Details"];
+const STEPS = ["Date", "Time", "Platform", "Details"];
 
 const TIME_SLOTS = [
   { time: "09:00 AM", available: true },
@@ -84,9 +84,10 @@ const BookingWizard = ({
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return selectedDate !== null && selectedTime !== null;
-      case 1: return selectedLocation !== null;
-      case 2: return formData.email.trim() !== "";
+      case 0: return selectedDate !== null;
+      case 1: return selectedTime !== null;
+      case 2: return selectedLocation !== null;
+      case 3: return formData.email.trim() !== "";
       default: return false;
     }
   };
@@ -130,21 +131,25 @@ const BookingWizard = ({
     switch (currentStep) {
       case 0:
         return (
-          <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full">
-            {/* Calendar */}
-            <div className="flex flex-col items-center">
-              <h2 className="text-xl font-semibold text-foreground mb-6">
-                {isRescheduling ? "Select a new date & time" : "Select a date & time"}
-              </h2>
-              <BookingCalendar
-                selectedDate={selectedDate}
-                onDateSelect={setSelectedDate}
-              />
-            </div>
-            
-            {/* Time Slots */}
+          <div className="flex flex-col items-center w-full px-2">
+            <h2 className="text-xl font-semibold text-foreground mb-6">
+              {isRescheduling ? "Select a new date" : "Select a date"}
+            </h2>
+            <BookingCalendar
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+            />
+          </div>
+        );
+
+      case 1:
+        return (
+          <div className="flex flex-col items-center w-full max-w-xs px-2">
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              {isRescheduling ? "Select a new time" : "Select a time"}
+            </h2>
             {selectedDate && (
-              <div className="flex flex-col items-center w-full max-w-xs">
+              <>
                 <p className="text-sm text-muted-foreground mb-2">
                   {formatDate(selectedDate)}
                 </p>
@@ -168,14 +173,14 @@ const BookingWizard = ({
                     </button>
                   ))}
                 </div>
-              </div>
+              </>
             )}
           </div>
         );
 
-      case 1:
+      case 2:
         return (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center px-2">
             <h2 className="text-xl font-semibold text-foreground mb-6">
               Choose meeting platform
             </h2>
@@ -186,9 +191,9 @@ const BookingWizard = ({
           </div>
         );
 
-      case 2:
+      case 3:
         return (
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md px-2">
             <h2 className="text-xl font-semibold text-foreground mb-6 text-center">
               {isRescheduling ? "Confirm details" : "Your details"}
             </h2>

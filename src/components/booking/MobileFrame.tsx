@@ -19,7 +19,7 @@ const MobileFrame = ({ children, enabled }: MobileFrameProps) => {
         </div>
         {/* Phone Screen */}
         <div className="bg-white rounded-[28px] overflow-hidden h-[700px] overflow-y-auto">
-          <div className="transform scale-[0.85] origin-top w-[118%] -ml-[9%]">
+          <div className="w-full">
             {children}
           </div>
         </div>
