@@ -11,6 +11,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import RevenuegridLogo from "@/assets/revenuegrid-logo.svg";
@@ -234,27 +242,89 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
         </footer>
       )}
 
-      {/* Cancel Dialog */}
-      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
-              <CalendarX className="w-5 h-5" />
-              Cancel Meeting
-            </DialogTitle>
-            <DialogDescription>
-              Please let us know why you're cancelling. This helps the organizer.
-            </DialogDescription>
-          </DialogHeader>
+      {/* Cancel Dialog - Desktop */}
+      {!isMobile && (
+        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive">
+                <CalendarX className="w-5 h-5" />
+                Cancel Meeting
+              </DialogTitle>
+              <DialogDescription>
+                Please let us know why you're cancelling. This helps the organizer.
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                {cancelReasons.map((reason) => (
+                  <button
+                    key={reason}
+                    onClick={() => setSelectedReason(reason)}
+                    className={cn(
+                      "w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-200",
+                      selectedReason === reason
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <span className="text-sm font-medium">{reason}</span>
+                  </button>
+                ))}
+              </div>
+
+              {selectedReason === "Other" && (
+                <div className="space-y-2">
+                  <Label htmlFor="reason">Please specify</Label>
+                  <Textarea
+                    id="reason"
+                    placeholder="Tell us more..."
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
+                Keep Meeting
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleCancel}
+                disabled={!selectedReason || (selectedReason === "Other" && !cancelReason.trim())}
+              >
+                Cancel Meeting
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Cancel Drawer - Mobile (renders inside the component flow) */}
+      {isMobile && showCancelDialog && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end">
+          <div className="bg-card w-full rounded-t-2xl max-h-[85%] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+            <div className="p-4 border-b border-border">
+              <div className="flex items-center gap-2 text-destructive font-semibold">
+                <CalendarX className="w-5 h-5" />
+                Cancel Meeting
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Please let us know why you're cancelling.
+              </p>
+            </div>
+
+            <div className="p-4 space-y-2">
               {cancelReasons.map((reason) => (
                 <button
                   key={reason}
                   onClick={() => setSelectedReason(reason)}
                   className={cn(
-                    "w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-200",
+                    "w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all duration-200",
                     selectedReason === reason
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
@@ -263,36 +333,41 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
                   <span className="text-sm font-medium">{reason}</span>
                 </button>
               ))}
+
+              {selectedReason === "Other" && (
+                <div className="space-y-2 pt-2">
+                  <Label htmlFor="reason-mobile" className="text-sm">Please specify</Label>
+                  <Textarea
+                    id="reason-mobile"
+                    placeholder="Tell us more..."
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    className="min-h-[60px]"
+                  />
+                </div>
+              )}
             </div>
 
-            {selectedReason === "Other" && (
-              <div className="space-y-2">
-                <Label htmlFor="reason">Please specify</Label>
-                <Textarea
-                  id="reason"
-                  placeholder="Tell us more..."
-                  value={cancelReason}
-                  onChange={(e) => setCancelReason(e.target.value)}
-                  className="min-h-[80px]"
-                />
-              </div>
-            )}
+            <div className="p-4 border-t border-border flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCancelDialog(false)}
+                className="flex-1"
+              >
+                Keep
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleCancel}
+                disabled={!selectedReason || (selectedReason === "Other" && !cancelReason.trim())}
+                className="flex-1"
+              >
+                Cancel Meeting
+              </Button>
+            </div>
           </div>
-
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
-              Keep Meeting
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleCancel}
-              disabled={!selectedReason || (selectedReason === "Other" && !cancelReason.trim())}
-            >
-              Cancel Meeting
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   );
 };

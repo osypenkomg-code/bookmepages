@@ -253,6 +253,23 @@ const InviteeConfirmationEmail = () => (
   </div>
 );
 
+// Reason Card Component - Consistent placement for reschedule/cancellation reasons
+const ReasonCard = ({ type, reason }: { type: "reschedule" | "cancellation"; reason: string }) => (
+  <div className={cn(
+    "rounded-xl p-6 mb-8 border",
+    type === "reschedule" ? "bg-blue-50 border-blue-200" : "bg-red-50 border-red-200"
+  )}>
+    <h3 className={cn(
+      "text-lg font-semibold mb-3 flex items-center gap-2",
+      type === "reschedule" ? "text-blue-800" : "text-red-800"
+    )}>
+      <MessageSquare className="w-5 h-5" />
+      {type === "reschedule" ? "Reason for Rescheduling" : "Reason for Cancellation"}
+    </h3>
+    <p className="text-gray-700 italic">"{reason}"</p>
+  </div>
+);
+
 // Host Reschedule Notification Email
 const HostRescheduleEmail = () => (
   <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
@@ -275,6 +292,9 @@ const HostRescheduleEmail = () => (
         </p>
       </div>
 
+      {/* Reason Card - Placed prominently before schedule details */}
+      <ReasonCard type="reschedule" reason={sampleData.rescheduleReason} />
+
       {/* Time Change Highlight */}
       <div className="bg-blue-50 rounded-xl p-6 mb-8 border border-blue-200">
         <h3 className="text-lg font-semibold text-blue-800 mb-4">Schedule Change</h3>
@@ -290,11 +310,7 @@ const HostRescheduleEmail = () => (
         </div>
       </div>
 
-      <MeetingDetailsCard 
-        showReason={true} 
-        reasonLabel="Reason for rescheduling" 
-        reason={sampleData.rescheduleReason} 
-      />
+      <MeetingDetailsCard />
     </div>
     <EmailFooter />
   </div>
@@ -322,17 +338,13 @@ const HostCancellationEmail = () => (
         </p>
       </div>
 
-      {/* Cancellation Notice */}
-      <div className="bg-red-50 rounded-xl p-6 mb-8 border border-red-200">
-        <h3 className="text-lg font-semibold text-red-800 mb-3">Cancellation Details</h3>
-        <div className="space-y-2">
-          <p className="text-gray-700">
-            <span className="font-medium">Originally scheduled:</span> {sampleData.startDate}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-medium">Reason:</span> <span className="italic">"{sampleData.cancellationReason}"</span>
-          </p>
-        </div>
+      {/* Reason Card - Consistent placement with reschedule email */}
+      <ReasonCard type="cancellation" reason={sampleData.cancellationReason} />
+
+      {/* Originally Scheduled Info */}
+      <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Originally Scheduled</h3>
+        <p className="text-gray-700 font-medium">{sampleData.startDate}</p>
       </div>
 
       <MeetingDetailsCard />
