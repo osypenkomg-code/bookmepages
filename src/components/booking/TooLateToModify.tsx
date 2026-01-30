@@ -42,19 +42,23 @@ const TooLateToModify = ({
         />
       </header>
 
-      <div className={cn(
-        "flex-1 flex items-center justify-center",
-        isMobilePreview ? "p-3" : "p-4 md:p-8"
-      )}>
+      <div
+        className={cn(
+          "flex-1",
+          isMobilePreview
+            ? "p-3 flex items-start justify-start"
+            : "flex items-center justify-center p-4 md:p-8"
+        )}
+      >
         <div className="bg-card rounded-2xl shadow-lg border border-border w-full max-w-lg overflow-hidden">
           <div className={isMobilePreview ? "p-4" : "p-6 md:p-10"}>
             {/* Warning Icon */}
             <div className="flex justify-center mb-3">
               <div className={cn(
-                "rounded-full bg-amber-100 flex items-center justify-center",
+                "rounded-full bg-accent flex items-center justify-center",
                 isMobilePreview ? "w-12 h-12" : "w-20 h-20"
               )}>
-                <Clock className={isMobilePreview ? "w-6 h-6 text-amber-600" : "w-10 h-10 text-amber-600"} />
+                <Clock className={isMobilePreview ? "w-6 h-6 text-primary" : "w-10 h-10 text-primary"} />
               </div>
             </div>
 
@@ -74,23 +78,23 @@ const TooLateToModify = ({
 
             {/* Alert Box */}
             <div className={cn(
-              "bg-amber-50 border border-amber-200 rounded-xl",
+              "bg-accent/50 border border-border rounded-xl",
               isMobilePreview ? "p-3 mb-3" : "p-5 mb-6"
             )}>
               <div className="flex items-start gap-2">
                 <AlertCircle className={cn(
-                  "text-amber-600 shrink-0",
+                  "text-primary shrink-0",
                   isMobilePreview ? "w-4 h-4 mt-0.5" : "w-5 h-5 mt-0.5"
                 )} />
                 <div>
                   <p className={cn(
-                    "text-amber-800 font-medium",
+                    "text-foreground font-medium",
                     isMobilePreview ? "text-xs mb-0.5" : "text-sm mb-1"
                   )}>
                     {actionLabel} window has closed
                   </p>
                   <p className={cn(
-                    "text-amber-700",
+                    "text-muted-foreground",
                     isMobilePreview ? "text-xs leading-tight" : "text-sm"
                   )}>
                     {isMobilePreview 
@@ -159,7 +163,7 @@ const TooLateToModify = ({
               isMobilePreview ? "mb-3" : "mb-6"
             )}>
               <span className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-700 font-medium",
+                "inline-flex items-center gap-1.5 rounded-full bg-destructive/10 text-destructive font-medium",
                 isMobilePreview ? "px-3 py-1 text-[10px]" : "px-4 py-2 text-sm gap-2"
               )}>
                 <Clock className={isMobilePreview ? "w-3 h-3" : "w-4 h-4"} />
@@ -203,7 +207,11 @@ const TooLateToModify = ({
         "text-center text-muted-foreground border-t border-border bg-card",
         isMobilePreview ? "py-2 text-[10px]" : "py-4 text-sm"
       )}>
-        © 2026 RevenueGrid.com
+        <div className={cn("mx-auto", isMobilePreview ? "max-w-[320px]" : "max-w-lg")}
+        >
+          <div className={cn(isMobilePreview ? "leading-snug" : "")}>© 2026 RevenueGrid.com</div>
+          <div className={cn(isMobilePreview ? "mt-0.5" : "mt-1")}>Meeting: {meetingDate} · {meetingTime}</div>
+        </div>
       </footer>
     </div>
   );
