@@ -65,6 +65,7 @@ const Index = () => {
           <TooLateToModify 
             action={tooLateAction}
             onGoBack={() => setViewMode("attendee")}
+            isMobilePreview={isMobilePreview}
           />
         );
       default:
