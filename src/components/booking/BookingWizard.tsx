@@ -370,66 +370,124 @@ const BookingWizard = ({
 
   const renderStepContent = () => {
     if (isMobile) {
-      // Mobile: 4 separate steps - compact layout
-      switch (currentStep) {
-        case 0:
-          return (
-            <div className="flex flex-col items-center w-full px-2">
-              <h2 className="text-lg font-semibold text-foreground mb-3">
-                {isRescheduling ? "Select a new date" : "Select a date"}
-              </h2>
-              <BookingCalendar
-                selectedDate={selectedDate}
-                onDateSelect={setSelectedDate}
-                compact={true}
-              />
-            </div>
-          );
-        case 1:
-          return (
-            <div className="flex flex-col items-center w-full max-w-xs px-2">
-              <h2 className="text-lg font-semibold text-foreground mb-2">
-                {isRescheduling ? "Select a new time" : "Select a time"}
-              </h2>
-              {renderTimeSlots()}
-            </div>
-          );
-        case 2:
-          return renderPlatformStep();
-        case 3:
-          return renderDetailsStep();
-        default:
-          return null;
-      }
-    } else {
-      // Desktop: 3 steps with Date & Time combined
-      switch (currentStep) {
-        case 0:
-          return (
-            <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full px-2">
-              {/* Calendar */}
-              <div className="flex flex-col items-center">
-                <h2 className="text-xl font-semibold text-foreground mb-6">
-                  {isRescheduling ? "Select a new date & time" : "Select a date & time"}
+      // Mobile: steps depend on whether platform selection is shown
+      if (showPlatformStep) {
+        // 4 steps: Date, Time, Platform, Details
+        switch (currentStep) {
+          case 0:
+            return (
+              <div className="flex flex-col items-center w-full px-2">
+                <h2 className="text-lg font-semibold text-foreground mb-3">
+                  {isRescheduling ? "Select a new date" : "Select a date"}
                 </h2>
                 <BookingCalendar
                   selectedDate={selectedDate}
                   onDateSelect={setSelectedDate}
+                  compact={true}
                 />
               </div>
-              
-              {/* Time Slots */}
-              <div className="flex flex-col items-center w-full max-w-xs">
+            );
+          case 1:
+            return (
+              <div className="flex flex-col items-center w-full max-w-xs px-2">
+                <h2 className="text-lg font-semibold text-foreground mb-2">
+                  {isRescheduling ? "Select a new time" : "Select a time"}
+                </h2>
                 {renderTimeSlots()}
               </div>
-            </div>
-          );
-        case 1:
-          return renderPlatformStep();
-        case 2:
-          return renderDetailsStep();
-        default:
-          return null;
+            );
+          case 2:
+            return renderPlatformStep();
+          case 3:
+            return renderDetailsStep();
+          default:
+            return null;
+        }
+      } else {
+        // 3 steps: Date, Time, Details (skip platform)
+        switch (currentStep) {
+          case 0:
+            return (
+              <div className="flex flex-col items-center w-full px-2">
+                <h2 className="text-lg font-semibold text-foreground mb-3">
+                  {isRescheduling ? "Select a new date" : "Select a date"}
+                </h2>
+                <BookingCalendar
+                  selectedDate={selectedDate}
+                  onDateSelect={setSelectedDate}
+                  compact={true}
+                />
+              </div>
+            );
+          case 1:
+            return (
+              <div className="flex flex-col items-center w-full max-w-xs px-2">
+                <h2 className="text-lg font-semibold text-foreground mb-2">
+                  {isRescheduling ? "Select a new time" : "Select a time"}
+                </h2>
+                {renderTimeSlots()}
+              </div>
+            );
+          case 2:
+            return renderDetailsStep();
+          default:
+            return null;
+        }
+      }
+    } else {
+      // Desktop: steps depend on whether platform selection is shown
+      if (showPlatformStep) {
+        // 3 steps: Date & Time, Platform, Details
+        switch (currentStep) {
+          case 0:
+            return (
+              <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full px-2">
+                <div className="flex flex-col items-center">
+                  <h2 className="text-xl font-semibold text-foreground mb-6">
+                    {isRescheduling ? "Select a new date & time" : "Select a date & time"}
+                  </h2>
+                  <BookingCalendar
+                    selectedDate={selectedDate}
+                    onDateSelect={setSelectedDate}
+                  />
+                </div>
+                <div className="flex flex-col items-center w-full max-w-xs">
+                  {renderTimeSlots()}
+                </div>
+              </div>
+            );
+          case 1:
+            return renderPlatformStep();
+          case 2:
+            return renderDetailsStep();
+          default:
+            return null;
+        }
+      } else {
+        // 2 steps: Date & Time, Details (skip platform)
+        switch (currentStep) {
+          case 0:
+            return (
+              <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full px-2">
+                <div className="flex flex-col items-center">
+                  <h2 className="text-xl font-semibold text-foreground mb-6">
+                    {isRescheduling ? "Select a new date & time" : "Select a date & time"}
+                  </h2>
+                  <BookingCalendar
+                    selectedDate={selectedDate}
+                    onDateSelect={setSelectedDate}
+                  />
+                </div>
+                <div className="flex flex-col items-center w-full max-w-xs">
+                  {renderTimeSlots()}
+                </div>
+              </div>
+            );
+          case 1:
+            return renderDetailsStep();
+          default:
+            return null;
+        }
       }
     }
   };
