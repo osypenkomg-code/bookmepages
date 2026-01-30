@@ -26,6 +26,7 @@ interface BookingWizardProps {
   organizerEmail?: string;
   timezone?: string;
   isRescheduling?: boolean;
+  isMobilePreview?: boolean;
   onComplete?: () => void;
 }
 
@@ -59,6 +60,7 @@ const BookingWizard = ({
   organizerEmail = "maksym.osypenko@revenuegrid.com",
   timezone = "(UTC +02:00) Kyiv",
   isRescheduling = false,
+  isMobilePreview = false,
   onComplete,
 }: BookingWizardProps) => {
   // Auto-select today or next available date (27th for demo)
@@ -73,7 +75,9 @@ const BookingWizard = ({
     return new Date(today.getFullYear(), today.getMonth(), 27);
   };
 
-  const isMobile = useIsMobile();
+  const isMobileHook = useIsMobile();
+  // Use prop override if set, otherwise fall back to hook
+  const isMobile = isMobilePreview || isMobileHook;
   const steps = isMobile ? MOBILE_STEPS : DESKTOP_STEPS;
   
   const [currentStep, setCurrentStep] = useState(0);

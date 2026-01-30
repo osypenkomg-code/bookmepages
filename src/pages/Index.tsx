@@ -28,6 +28,7 @@ const Index = () => {
       return (
         <BookingWizard 
           isRescheduling={true} 
+          isMobilePreview={isMobilePreview}
           onComplete={handleRescheduleComplete}
         />
       );
@@ -37,7 +38,7 @@ const Index = () => {
       case "organizer-classic":
         return <BookingWidget isMobilePreview={isMobilePreview} />;
       case "organizer-wizard":
-        return <BookingWizard />;
+        return <BookingWizard isMobilePreview={isMobilePreview} />;
       case "attendee":
         return <AttendeeView onReschedule={handleReschedule} />;
       case "email-preview":
