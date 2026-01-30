@@ -12,6 +12,7 @@ const Index = () => {
   const [isRescheduling, setIsRescheduling] = useState(false);
   const [tooLateAction, setTooLateAction] = useState<"reschedule" | "cancel">("reschedule");
   const [isMobilePreview, setIsMobilePreview] = useState(false);
+  const [showPlatformSelection, setShowPlatformSelection] = useState(true);
 
   const handleReschedule = () => {
     setIsRescheduling(true);
@@ -29,6 +30,7 @@ const Index = () => {
         <BookingWizard 
           isRescheduling={true} 
           isMobilePreview={isMobilePreview}
+          showPlatformSelection={showPlatformSelection}
           onComplete={handleRescheduleComplete}
         />
       );
@@ -36,9 +38,19 @@ const Index = () => {
 
     switch (viewMode) {
       case "organizer-classic":
-        return <BookingWidget isMobilePreview={isMobilePreview} />;
+        return (
+          <BookingWidget 
+            isMobilePreview={isMobilePreview} 
+            location={showPlatformSelection ? "Zoom" : "Microsoft Teams"}
+          />
+        );
       case "organizer-wizard":
-        return <BookingWizard isMobilePreview={isMobilePreview} />;
+        return (
+          <BookingWizard 
+            isMobilePreview={isMobilePreview} 
+            showPlatformSelection={showPlatformSelection}
+          />
+        );
       case "attendee":
         return <AttendeeView onReschedule={handleReschedule} isMobilePreview={isMobilePreview} />;
       case "email-preview":
@@ -51,7 +63,7 @@ const Index = () => {
           />
         );
       default:
-        return <BookingWizard />;
+        return <BookingWizard showPlatformSelection={showPlatformSelection} />;
     }
   };
 
@@ -68,6 +80,8 @@ const Index = () => {
         }}
         isMobilePreview={isMobilePreview}
         onMobilePreviewChange={setIsMobilePreview}
+        showPlatformSelection={showPlatformSelection}
+        onPlatformSelectionChange={setShowPlatformSelection}
       />
       <MobileFrame enabled={shouldUseMobileFrame}>
         {renderView()}
