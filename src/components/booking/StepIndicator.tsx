@@ -30,27 +30,29 @@ const StepIndicator = ({ steps, currentStep, compact = false }: StepIndicatorPro
   const visibleSteps = getVisibleSteps();
 
   return (
-    <div className="flex items-center justify-center mb-8">
+    <div className={cn("flex items-center justify-center", compact ? "mb-4" : "mb-8")}>
       {visibleSteps.map(({ step, originalIndex }, displayIndex) => (
         <div key={step} className="flex items-center">
           {/* Step circle and label */}
           <div className="flex flex-col items-center">
             <div
               className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
+                "rounded-full flex items-center justify-center font-medium transition-all duration-300",
+                compact ? "w-7 h-7 text-xs" : "w-9 h-9 text-sm",
                 originalIndex < currentStep && "bg-primary text-primary-foreground",
                 originalIndex === currentStep && "bg-primary text-primary-foreground ring-4 ring-primary/20",
                 originalIndex > currentStep && "bg-muted text-muted-foreground"
               )}
             >
               {originalIndex < currentStep ? (
-                <Check className="w-4 h-4" />
+                <Check className={compact ? "w-3 h-3" : "w-4 h-4"} />
               ) : (
                 originalIndex + 1
               )}
             </div>
             <span className={cn(
-              "text-xs mt-2 font-medium whitespace-nowrap",
+              "font-medium whitespace-nowrap",
+              compact ? "text-[10px] mt-1" : "text-xs mt-2",
               originalIndex <= currentStep ? "text-foreground" : "text-muted-foreground"
             )}>
               {step}
@@ -59,11 +61,11 @@ const StepIndicator = ({ steps, currentStep, compact = false }: StepIndicatorPro
           
           {/* Connector line */}
           {displayIndex < visibleSteps.length - 1 && (
-            <div className="flex items-center h-9">
+            <div className={cn("flex items-center", compact ? "h-7" : "h-9")}>
               <div
                 className={cn(
-                  "h-0.5 mx-2 transition-all duration-300",
-                  compact ? "w-8" : "w-16 md:w-24",
+                  "h-0.5 transition-all duration-300",
+                  compact ? "w-6 mx-1.5" : "w-16 md:w-24 mx-2",
                   originalIndex < currentStep ? "bg-primary" : "bg-muted"
                 )}
               />

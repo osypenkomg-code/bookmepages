@@ -7,6 +7,7 @@ interface BookingCalendarProps {
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
   availableDates?: Date[];
+  compact?: boolean;
 }
 
 const DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
@@ -19,6 +20,7 @@ const BookingCalendar = ({
   selectedDate,
   onDateSelect,
   availableDates = [],
+  compact = false,
 }: BookingCalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 0, 1)); // January 2026
 
@@ -69,10 +71,11 @@ const BookingCalendar = ({
 
   const renderCalendarDays = () => {
     const days = [];
+    const cellSize = compact ? "h-8 w-8" : "h-10 w-10";
     
     // Empty cells for days before the first of the month
     for (let i = 0; i < startingDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
+      days.push(<div key={`empty-${i}`} className={cellSize} />);
     }
     
     // Days of the month
@@ -86,8 +89,10 @@ const BookingCalendar = ({
           onClick={() => handleDateClick(day)}
           disabled={!available}
           className={cn(
-            "h-10 w-10 rounded-full text-sm font-medium transition-all duration-200",
+            cellSize,
+            "rounded-full font-medium transition-all duration-200",
             "flex items-center justify-center",
+            compact ? "text-xs" : "text-sm",
             selected && "bg-primary text-primary-foreground shadow-md",
             !selected && available && "text-primary hover:bg-primary/20 cursor-pointer",
             !available && "text-muted-foreground/40 cursor-not-allowed"
@@ -104,34 +109,40 @@ const BookingCalendar = ({
   return (
     <div className="w-full max-w-sm">
       {/* Month Navigation */}
-      <div className="flex items-center justify-center gap-4 mb-4">
+      <div className={cn("flex items-center justify-center gap-4", compact ? "mb-2" : "mb-4")}>
         <Button
           variant="ghost"
           size="icon"
           onClick={handlePrevMonth}
-          className="h-8 w-8 text-primary hover:bg-primary/10"
+          className={cn("text-primary hover:bg-primary/10", compact ? "h-6 w-6" : "h-8 w-8")}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className={compact ? "h-3 w-3" : "h-4 w-4"} />
         </Button>
-        <h2 className="text-lg font-semibold text-primary min-w-[160px] text-center">
+        <h2 className={cn(
+          "font-semibold text-primary min-w-[140px] text-center",
+          compact ? "text-base" : "text-lg min-w-[160px]"
+        )}>
           {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h2>
         <Button
           variant="ghost"
           size="icon"
           onClick={handleNextMonth}
-          className="h-8 w-8 text-primary hover:bg-primary/10"
+          className={cn("text-primary hover:bg-primary/10", compact ? "h-6 w-6" : "h-8 w-8")}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className={compact ? "h-3 w-3" : "h-4 w-4"} />
         </Button>
       </div>
       
       {/* Days of Week Header */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-1">
         {DAYS.map((day) => (
           <div
             key={day}
-            className="h-10 w-10 flex items-center justify-center text-xs font-medium text-muted-foreground"
+            className={cn(
+              "flex items-center justify-center font-medium text-muted-foreground",
+              compact ? "h-8 w-8 text-[10px]" : "h-10 w-10 text-xs"
+            )}
           >
             {day}
           </div>
