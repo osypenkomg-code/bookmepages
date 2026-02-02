@@ -31,10 +31,13 @@ interface BookingDetails {
   duration: string;
   location: string;
   organizerName: string;
+  organizerCompany: string;
   organizerEmail: string;
   timezone: string;
+  timezoneShort: string;
   attendeeName: string;
   attendeeEmail: string;
+  meetingLink?: string;
 }
 
 interface AttendeeViewProps {
@@ -50,10 +53,13 @@ const defaultBooking: BookingDetails = {
   duration: "30min",
   location: "Zoom",
   organizerName: "Maksym Osypenko",
+  organizerCompany: "RevenueGrid",
   organizerEmail: "maksym.osypenko@revenuegrid.com",
   timezone: "(UTC +02:00) Kyiv",
+  timezoneShort: "Kyiv time (UTC+2)",
   attendeeName: "John Doe",
   attendeeEmail: "john.doe@example.com",
+  meetingLink: "https://zoom.us/j/123456789",
 };
 
 const formatDate = (date: Date, compact = false) => {
@@ -173,9 +179,7 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
                   <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>
                     {booking.time} ({booking.duration})
                   </p>
-                  {!isMobile && (
-                    <p className="text-sm text-muted-foreground">{booking.timezone}</p>
-                  )}
+                  <p className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-sm")}>{booking.timezoneShort}</p>
                 </div>
               </div>
 
@@ -183,8 +187,22 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
                 <MapPin className={cn("text-primary mt-0.5", isMobile ? "w-4 h-4" : "w-5 h-5")} />
                 <div>
                   <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>{booking.location}</p>
-                  {!isMobile && (
-                    <p className="text-sm text-muted-foreground">Meeting link will be sent via email</p>
+                  {booking.meetingLink ? (
+                    <a 
+                      href={booking.meetingLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "inline-flex items-center gap-1 text-primary hover:underline font-medium",
+                        isMobile ? "text-[10px]" : "text-sm"
+                      )}
+                    >
+                      Join meeting
+                    </a>
+                  ) : (
+                    <p className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-sm")}>
+                      The meeting link will be included in the calendar invite.
+                    </p>
                   )}
                 </div>
               </div>
@@ -193,9 +211,7 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
                 <User className={cn("text-primary mt-0.5", isMobile ? "w-4 h-4" : "w-5 h-5")} />
                 <div>
                   <p className={cn("font-medium text-foreground", isMobile ? "text-xs" : "text-sm")}>{booking.organizerName}</p>
-                  {!isMobile && (
-                    <p className="text-sm text-muted-foreground">{booking.organizerEmail}</p>
-                  )}
+                  <p className={cn("text-muted-foreground", isMobile ? "text-[10px]" : "text-sm")}>{booking.organizerCompany}</p>
                 </div>
               </div>
             </div>
@@ -203,10 +219,9 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
             {/* Action Buttons */}
             <div className={cn("grid grid-cols-2", isMobile ? "gap-2" : "gap-4")}>
               <Button
-                variant="outline"
                 onClick={handleReschedule}
                 className={cn(
-                  "flex items-center justify-center gap-2 border-2 hover:border-primary hover:bg-primary/5",
+                  "flex items-center justify-center gap-2",
                   isMobile ? "h-10 text-xs" : "h-14"
                 )}
               >
@@ -228,7 +243,7 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
 
             {!isMobile && (
               <p className="text-xs text-muted-foreground text-center mt-6">
-                Need to make changes? Reschedule or cancel anytime before the meeting.
+                You can reschedule or cancel until the host's cutoff time.
               </p>
             )}
           </div>
