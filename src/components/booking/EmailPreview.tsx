@@ -5,13 +5,15 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation";
+type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation" | "invitee-reschedule" | "invitee-cancellation";
 
 const emailTypes: { id: EmailType; label: string; description: string }[] = [
   { id: "host-confirmation", label: "Host Confirmation", description: "Sent to organizer when meeting is booked" },
   { id: "invitee-confirmation", label: "Invitee Confirmation", description: "Sent to attendee when meeting is booked" },
-  { id: "host-reschedule", label: "Reschedule Notice", description: "Sent to organizer when meeting is rescheduled" },
-  { id: "host-cancellation", label: "Cancellation Notice", description: "Sent to organizer when meeting is cancelled" },
+  { id: "host-reschedule", label: "Host Reschedule", description: "Sent to organizer when meeting is rescheduled" },
+  { id: "host-cancellation", label: "Host Cancellation", description: "Sent to organizer when meeting is cancelled" },
+  { id: "invitee-reschedule", label: "Invitee Reschedule", description: "Sent to attendee when meeting is rescheduled" },
+  { id: "invitee-cancellation", label: "Invitee Cancellation", description: "Sent to attendee when meeting is cancelled" },
 ];
 
 const sampleData = {
@@ -357,6 +359,124 @@ const HostCancellationEmail = () => (
   </div>
 );
 
+// Invitee Reschedule Notification Email
+const InviteeRescheduleEmail = () => (
+  <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
+    <EmailHeader />
+    <div className="px-8 py-8">
+      <div className="text-center mb-8">
+        <RescheduleIcon />
+        <h1 className="text-2xl font-bold text-[#1a2942] mb-2">Your meeting has been rescheduled</h1>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-gray-700 text-base">
+          Hi <span className="font-semibold">{sampleData.inviteeName}</span>,
+        </p>
+      </div>
+
+      <div className="mb-8">
+        <p className="text-gray-700 text-base">
+          Your meeting '<span className="font-semibold text-[#1a2942]">{sampleData.eventTitle}</span>' with <span className="font-semibold">{sampleData.userDisplayName}</span> has been rescheduled.
+        </p>
+      </div>
+
+      {/* Time Change Highlight - Prominent display of old vs new time */}
+      <div className="bg-blue-50 rounded-xl p-6 mb-8 border border-blue-200">
+        <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center gap-2">
+          <RefreshCw className="w-5 h-5" />
+          Schedule Change
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500 w-24">Original:</span>
+            <span className="font-medium text-gray-500 line-through">{sampleData.originalStartDate}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-blue-600 w-24">New time:</span>
+            <span className="font-semibold text-blue-800">{sampleData.newStartDate}</span>
+          </div>
+        </div>
+      </div>
+
+      <MeetingDetailsCard />
+
+      <div className="border-t border-gray-200 pt-6 mb-4">
+        <p className="text-center text-gray-600 mb-4">Need to make changes?</p>
+        <ActionButtons />
+      </div>
+
+      <div className="text-center text-gray-500 text-sm">
+        <p>Your calendar invite has been updated automatically.</p>
+      </div>
+    </div>
+    <EmailFooter />
+  </div>
+);
+
+// Invitee Cancellation Notification Email
+const InviteeCancellationEmail = () => (
+  <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
+    <EmailHeader />
+    <div className="px-8 py-8">
+      <div className="text-center mb-8">
+        <CancelIcon />
+        <h1 className="text-2xl font-bold text-[#1a2942] mb-2">Your meeting has been cancelled</h1>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-gray-700 text-base">
+          Hi <span className="font-semibold">{sampleData.inviteeName}</span>,
+        </p>
+      </div>
+
+      <div className="mb-8">
+        <p className="text-gray-700 text-base">
+          We're sorry to inform you that your meeting '<span className="font-semibold text-[#1a2942]">{sampleData.eventTitle}</span>' with <span className="font-semibold">{sampleData.userDisplayName}</span> has been cancelled.
+        </p>
+      </div>
+
+      {/* Reason Card */}
+      <ReasonCard type="cancellation" reason={sampleData.cancellationReason} />
+
+      {/* Originally Scheduled Info */}
+      <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Originally Scheduled</h3>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-5 h-5 text-gray-400" />
+            <span className="text-gray-700 font-medium">{sampleData.startDate}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Clock className="w-5 h-5 text-gray-400" />
+            <span className="text-gray-700">{sampleData.duration} minutes</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <MapPin className="w-5 h-5 text-gray-400" />
+            <span className="text-gray-700">{sampleData.location}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-center">
+        <p className="text-gray-600 mb-4">Would you like to schedule a new meeting?</p>
+        <a
+          href="#"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+        >
+          <Calendar className="w-4 h-4" />
+          Book a New Time
+        </a>
+      </div>
+
+      <div className="text-center text-gray-500 text-sm mt-6">
+        <p>The calendar invite has been removed automatically.</p>
+      </div>
+    </div>
+    <EmailFooter />
+  </div>
+);
+
 const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
   const baseVars = ["{eventTitle}", "{UserDisplayName}", "{invitees}", "{startDate}", "{duration}", "{locationString}", "{phone}", "{notes}"];
   
@@ -365,6 +485,8 @@ const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
     "invitee-confirmation": [...baseVars, "{rescheduleLink}", "{cancelLink}"],
     "host-reschedule": [...baseVars, "{originalStartDate}", "{newStartDate}", "{rescheduleReason}"],
     "host-cancellation": [...baseVars, "{cancellationReason}"],
+    "invitee-reschedule": [...baseVars, "{originalStartDate}", "{newStartDate}", "{rescheduleLink}", "{cancelLink}"],
+    "invitee-cancellation": [...baseVars, "{cancellationReason}", "{bookNewLink}"],
   };
 
   return (
@@ -401,6 +523,10 @@ const EmailPreview = ({ isMobilePreview: externalMobilePreview }: EmailPreviewPr
         return <HostRescheduleEmail />;
       case "host-cancellation":
         return <HostCancellationEmail />;
+      case "invitee-reschedule":
+        return <InviteeRescheduleEmail />;
+      case "invitee-cancellation":
+        return <InviteeCancellationEmail />;
     }
   };
 
