@@ -162,7 +162,7 @@ const TooLateToModify = ({
               <div className="flex justify-center mb-6">
                 <span className="inline-flex items-center gap-2 rounded-full bg-destructive/10 text-destructive font-medium px-4 py-2 text-sm">
                   <Clock className="w-4 h-4" />
-                  Less than {cutoffMinutes} min until meeting
+                  Starts in 7 minutes
                 </span>
               </div>
             )}
