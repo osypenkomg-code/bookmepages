@@ -55,10 +55,10 @@ const TooLateToModify = ({
             {/* Warning Icon */}
             <div className="flex justify-center mb-3">
               <div className={cn(
-                "rounded-full bg-accent flex items-center justify-center",
+                "rounded-full bg-secondary flex items-center justify-center",
                 isMobilePreview ? "w-12 h-12" : "w-20 h-20"
               )}>
-                <Clock className={isMobilePreview ? "w-6 h-6 text-primary" : "w-10 h-10 text-primary"} />
+                <Clock className={isMobilePreview ? "w-6 h-6 text-muted-foreground" : "w-10 h-10 text-muted-foreground"} />
               </div>
             </div>
 
@@ -78,12 +78,12 @@ const TooLateToModify = ({
 
             {/* Alert Box */}
             <div className={cn(
-              "bg-accent/50 border border-border rounded-xl",
+              "bg-muted border border-border rounded-xl",
               isMobilePreview ? "p-3 mb-3" : "p-5 mb-6"
             )}>
               <div className="flex items-start gap-2">
                 <AlertCircle className={cn(
-                  "text-primary shrink-0",
+                  "text-muted-foreground shrink-0",
                   isMobilePreview ? "w-4 h-4 mt-0.5" : "w-5 h-5 mt-0.5"
                 )} />
                 <div>
@@ -157,19 +157,15 @@ const TooLateToModify = ({
               </div>
             </div>
 
-            {/* Time Remaining Badge */}
-            <div className={cn(
-              "flex justify-center",
-              isMobilePreview ? "mb-3" : "mb-6"
-            )}>
-              <span className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-destructive/10 text-destructive font-medium",
-                isMobilePreview ? "px-3 py-1 text-[10px]" : "px-4 py-2 text-sm gap-2"
-              )}>
-                <Clock className={isMobilePreview ? "w-3 h-3" : "w-4 h-4"} />
-                Less than {cutoffMinutes} min until meeting
-              </span>
-            </div>
+            {/* Time Remaining Badge - hidden on mobile */}
+            {!isMobilePreview && (
+              <div className="flex justify-center mb-6">
+                <span className="inline-flex items-center gap-2 rounded-full bg-destructive/10 text-destructive font-medium px-4 py-2 text-sm">
+                  <Clock className="w-4 h-4" />
+                  Less than {cutoffMinutes} min until meeting
+                </span>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className={isMobilePreview ? "space-y-2" : "space-y-3"}>
