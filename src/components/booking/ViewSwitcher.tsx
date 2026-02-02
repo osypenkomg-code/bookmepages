@@ -65,7 +65,7 @@ const ViewSwitcher = ({
   };
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
+    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 items-end">
       {/* View Tabs */}
       <div className="bg-card border border-border rounded-full p-1 shadow-lg flex gap-1">
         {views.map((view) => (
