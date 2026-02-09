@@ -449,6 +449,16 @@ const LegacyInviteeConfirmationEmail = () => (
           <p><span className="font-semibold">Location:</span> {sampleData.location}</p>
           <p><span className="font-semibold">Description:</span></p>
         </div>
+
+        {/* Reschedule/Cancel link */}
+        <div className="border-t border-gray-300 mt-8 pt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Need to reschedule or cancel this meeting?{" "}
+            <a href="{rescheduleLink}" className="text-primary hover:underline font-medium">
+              Manage your booking
+            </a>
+          </p>
+        </div>
       </div>
     </div>
 
