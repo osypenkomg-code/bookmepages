@@ -481,6 +481,61 @@ const LegacyInviteeConfirmationEmail = ({ onManageBooking }: { onManageBooking?:
   </div>
 );
 
+// Legacy Host Confirmation Email - Matches original EML design exactly
+const LegacyHostConfirmationEmail = () => (
+  <div className="bg-gray-200 rounded-lg shadow-xl overflow-hidden border border-border">
+    {/* Header - Logo on light background */}
+    <div className="bg-gray-200 px-6 py-5">
+      <img src={RevenuegridLogo} alt="Revenue Grid" className="h-12" />
+    </div>
+
+    {/* Main content card */}
+    <div className="mx-4 mb-6 border border-gray-400 bg-white">
+      {/* Green heading band */}
+      <div className="bg-[#9ACEA8] px-8 py-8">
+        <h1 className="text-3xl font-bold text-[#1a2942]">A new meeting has been confirmed</h1>
+      </div>
+
+      {/* Body content */}
+      <div className="px-8 py-8">
+        <p className="text-gray-700 text-base mb-6">
+          Dear John Smith,
+        </p>
+
+        <p className="text-gray-700 text-base mb-8">
+          A new meeting 'Product Demo Call' has been confirmed by the invitee(s).
+        </p>
+
+        {/* Simple label: value list — plain text, no icons */}
+        <div className="space-y-1 text-base text-gray-700">
+          <p>Subject: Product Demo Call</p>
+          <p>Invitee(s): jane.doe@example.com, John Smith &lt;john.smith@example.com&gt;</p>
+          <p>Start date: 1/5/2026 11:00 AM (UTC +02:00) Kyiv</p>
+          <p>Duration (min): 30</p>
+          <p>Location: Zoom Meeting</p>
+          <p>Description:</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Footer - same style as Legacy Invitee */}
+    <div className="px-8 pb-6 pt-4 text-center">
+      <p className="text-xs text-gray-500 mb-0.5">950 East Paces Ferry Road, N.E.,</p>
+      <p className="text-xs text-gray-500 mb-0.5">Suite 2150 Salesforce Tower, Atlanta, GA 30326</p>
+      <a href="https://www.revenuegrid.com" className="text-xs text-gray-500 hover:underline">
+        www.revenuegrid.com
+      </a>
+      <div className="flex justify-between max-w-xs mx-auto mt-4">
+        {["f", "𝕏", "in", "▶"].map((icon) => (
+          <div key={icon} className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center">
+            <span className="text-xs text-gray-500">{icon}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 // Invitee Cancellation Notification Email
 const InviteeCancellationEmail = () => (
   <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
@@ -592,16 +647,7 @@ const EmailPreview = ({ isMobilePreview: externalMobilePreview, onNavigateToAtte
       case "legacy-invitee-confirmation":
         return <LegacyInviteeConfirmationEmail onManageBooking={onNavigateToAttendee} />;
       case "legacy-host-confirmation":
-        return (
-          <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
-            <iframe
-              src="/legacy-host-confirmation.html"
-              title="Legacy Host Confirmation Email"
-              className="w-full border-0"
-              style={{ minHeight: "700px" }}
-            />
-          </div>
-        );
+        return <LegacyHostConfirmationEmail />;
       case "host-reschedule":
         return <HostRescheduleEmail />;
       case "host-cancellation":
