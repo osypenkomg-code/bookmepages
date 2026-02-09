@@ -416,7 +416,7 @@ const InviteeRescheduleEmail = () => (
 );
 
 // Legacy Invitee Confirmation Email - Matches original EML design exactly
-const LegacyInviteeConfirmationEmail = () => (
+const LegacyInviteeConfirmationEmail = ({ onManageBooking }: { onManageBooking?: () => void }) => (
   <div className="bg-gray-200 rounded-lg shadow-xl overflow-hidden border border-border">
     {/* Header - Logo on light background */}
     <div className="bg-gray-200 px-6 py-5">
@@ -454,7 +454,7 @@ const LegacyInviteeConfirmationEmail = () => (
         <div className="border-t border-gray-300 mt-8 pt-6 text-center">
           <p className="text-sm text-gray-600">
             Need to reschedule or cancel this meeting?{" "}
-            <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-medium">
+            <a href="#" onClick={(e) => { e.preventDefault(); onManageBooking?.(); }} className="text-primary hover:underline font-medium cursor-pointer">
               Manage your booking
             </a>
           </p>
@@ -570,9 +570,10 @@ const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
 
 interface EmailPreviewProps {
   isMobilePreview?: boolean;
+  onNavigateToAttendee?: () => void;
 }
 
-const EmailPreview = ({ isMobilePreview: externalMobilePreview }: EmailPreviewProps) => {
+const EmailPreview = ({ isMobilePreview: externalMobilePreview, onNavigateToAttendee }: EmailPreviewProps) => {
   const [selectedType, setSelectedType] = useState<EmailType>("host-confirmation");
   const [internalMobileView, setInternalMobileView] = useState(false);
   
@@ -587,7 +588,7 @@ const EmailPreview = ({ isMobilePreview: externalMobilePreview }: EmailPreviewPr
       case "invitee-confirmation":
         return <InviteeConfirmationEmail />;
       case "legacy-invitee-confirmation":
-        return <LegacyInviteeConfirmationEmail />;
+        return <LegacyInviteeConfirmationEmail onManageBooking={onNavigateToAttendee} />;
       case "host-reschedule":
         return <HostRescheduleEmail />;
       case "host-cancellation":
