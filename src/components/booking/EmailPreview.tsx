@@ -454,7 +454,7 @@ const LegacyInviteeConfirmationEmail = () => (
         <div className="border-t border-gray-300 mt-8 pt-6 text-center">
           <p className="text-sm text-gray-600">
             Need to reschedule or cancel this meeting?{" "}
-            <a href="{rescheduleLink}" className="text-primary hover:underline font-medium">
+            <a href="#" onClick={(e) => e.preventDefault()} className="text-primary hover:underline font-medium">
               Manage your booking
             </a>
           </p>
