@@ -415,29 +415,33 @@ const InviteeRescheduleEmail = () => (
   </div>
 );
 
-// Legacy Invitee Confirmation Email - Simple plain design matching original EML
+// Legacy Invitee Confirmation Email - Matches original EML design exactly
 const LegacyInviteeConfirmationEmail = () => (
-  <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
-    {/* Header with RG logo on dark bg */}
-    <div className="bg-[#1a2942] px-6 py-5">
-      <img src={RevenuegridLogo} alt="Revenue Grid" className="h-10 brightness-0 invert" />
+  <div className="bg-gray-200 rounded-lg shadow-xl overflow-hidden border border-border">
+    {/* Header - Logo on light background */}
+    <div className="bg-gray-200 px-6 py-5">
+      <img src={RevenuegridLogo} alt="Revenue Grid" className="h-12" />
     </div>
 
-    {/* Main content card with left border accent */}
-    <div className="px-8 py-8">
-      <div className="border border-gray-200 rounded-md p-8 mb-8">
-        <h1 className="text-2xl font-bold text-[#1a2942] mb-8">A new meeting has been confirmed</h1>
+    {/* Main content card */}
+    <div className="mx-4 mb-6 border border-gray-400 bg-white">
+      {/* Green heading band */}
+      <div className="bg-[#b5d5a7] px-8 py-8">
+        <h1 className="text-3xl font-bold text-[#1a2942]">A new meeting has been confirmed</h1>
+      </div>
 
+      {/* Body content */}
+      <div className="px-8 py-8">
         <p className="text-gray-700 text-base mb-6">
-          Dear <span className="font-semibold">{sampleData.userDisplayName}</span>,
+          Dear <span>{sampleData.userDisplayName}</span>,
         </p>
 
         <p className="text-gray-700 text-base mb-8">
-          A new meeting '<span className="font-semibold">{sampleData.eventTitle}</span>' has been confirmed by the invitee(s).
+          A new meeting '<span>{sampleData.eventTitle}</span>' has been confirmed by the invitee(s).
         </p>
 
-        {/* Simple label: value list — no icons, plain text */}
-        <div className="space-y-2 text-sm text-gray-700">
+        {/* Simple label: value list — plain text, no icons */}
+        <div className="space-y-1 text-base text-gray-700">
           <p><span className="font-semibold">Subject:</span> {sampleData.eventTitle}</p>
           <p><span className="font-semibold">Invitee(s):</span> {sampleData.inviteeEmail}, {sampleData.userDisplayName} &lt;{sampleData.inviteeEmail}&gt;</p>
           <p><span className="font-semibold">Start date:</span> 1/5/2026 11:00 AM (UTC +02:00) Kyiv</p>
@@ -449,25 +453,16 @@ const LegacyInviteeConfirmationEmail = () => (
     </div>
 
     {/* Footer */}
-    <div className="px-8 pb-8 text-center">
-      <p className="text-xs text-gray-500 mb-1">
-        950 East Paces Ferry Road, N.E.,
-      </p>
-      <p className="text-xs text-gray-500 mb-1">
-        Suite 2150 Salesforce Tower, Atlanta, GA 30326
-      </p>
+    <div className="px-8 pb-6 pt-4 text-center">
+      <p className="text-xs text-gray-500 mb-0.5">950 East Paces Ferry Road, N.E.,</p>
+      <p className="text-xs text-gray-500 mb-0.5">Suite 2150 Salesforce Tower, Atlanta, GA 30326</p>
       <a href="https://www.revenuegrid.com" className="text-xs text-gray-500 hover:underline">
         www.revenuegrid.com
       </a>
-      <div className="flex justify-between max-w-sm mx-auto mt-6">
-        {[
-          { icon: "f", color: "#3b5998" },
-          { icon: "𝕏", color: "#1da1f2" },
-          { icon: "in", color: "#0077b5" },
-          { icon: "▶", color: "#ff0000" },
-        ].map((social) => (
-          <div key={social.icon} className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-            <span className="text-xs text-gray-500">{social.icon}</span>
+      <div className="flex justify-between max-w-xs mx-auto mt-4">
+        {["f", "𝕏", "in", "▶"].map((icon) => (
+          <div key={icon} className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center">
+            <span className="text-xs text-gray-500">{icon}</span>
           </div>
         ))}
       </div>
