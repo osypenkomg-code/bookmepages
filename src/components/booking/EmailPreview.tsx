@@ -5,11 +5,12 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation" | "invitee-reschedule" | "invitee-cancellation";
+type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation" | "invitee-reschedule" | "invitee-cancellation" | "legacy-invitee-confirmation";
 
 const emailTypes: { id: EmailType; label: string; description: string }[] = [
   { id: "host-confirmation", label: "Host Confirmation", description: "Sent to organizer when meeting is booked" },
   { id: "invitee-confirmation", label: "Invitee Confirmation", description: "Sent to attendee when meeting is booked" },
+  { id: "legacy-invitee-confirmation", label: "Legacy Invitee Confirmation", description: "Legacy email sent to attendee when meeting is booked" },
   { id: "host-reschedule", label: "Host Reschedule", description: "Sent to organizer when meeting is rescheduled" },
   { id: "host-cancellation", label: "Host Cancellation", description: "Sent to organizer when meeting is cancelled" },
   { id: "invitee-reschedule", label: "Invitee Reschedule", description: "Sent to attendee when meeting is rescheduled" },
@@ -414,6 +415,66 @@ const InviteeRescheduleEmail = () => (
   </div>
 );
 
+// Legacy Invitee Confirmation Email - Simple plain design matching original EML
+const LegacyInviteeConfirmationEmail = () => (
+  <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
+    {/* Header with RG logo on dark bg */}
+    <div className="bg-[#1a2942] px-6 py-5">
+      <img src={RevenuegridLogo} alt="Revenue Grid" className="h-10 brightness-0 invert" />
+    </div>
+
+    {/* Main content card with left border accent */}
+    <div className="px-8 py-8">
+      <div className="border border-gray-200 rounded-md p-8 mb-8">
+        <h1 className="text-2xl font-bold text-[#1a2942] mb-8">A new meeting has been confirmed</h1>
+
+        <p className="text-gray-700 text-base mb-6">
+          Dear <span className="font-semibold">{sampleData.userDisplayName}</span>,
+        </p>
+
+        <p className="text-gray-700 text-base mb-8">
+          A new meeting '<span className="font-semibold">{sampleData.eventTitle}</span>' has been confirmed by the invitee(s).
+        </p>
+
+        {/* Simple label: value list — no icons, plain text */}
+        <div className="space-y-2 text-sm text-gray-700">
+          <p><span className="font-semibold">Subject:</span> {sampleData.eventTitle}</p>
+          <p><span className="font-semibold">Invitee(s):</span> {sampleData.inviteeEmail}, {sampleData.userDisplayName} &lt;{sampleData.inviteeEmail}&gt;</p>
+          <p><span className="font-semibold">Start date:</span> 1/5/2026 11:00 AM (UTC +02:00) Kyiv</p>
+          <p><span className="font-semibold">Duration (min):</span> {sampleData.duration}</p>
+          <p><span className="font-semibold">Location:</span> {sampleData.location}</p>
+          <p><span className="font-semibold">Description:</span></p>
+        </div>
+      </div>
+    </div>
+
+    {/* Footer */}
+    <div className="px-8 pb-8 text-center">
+      <p className="text-xs text-gray-500 mb-1">
+        950 East Paces Ferry Road, N.E.,
+      </p>
+      <p className="text-xs text-gray-500 mb-1">
+        Suite 2150 Salesforce Tower, Atlanta, GA 30326
+      </p>
+      <a href="https://www.revenuegrid.com" className="text-xs text-gray-500 hover:underline">
+        www.revenuegrid.com
+      </a>
+      <div className="flex justify-between max-w-sm mx-auto mt-6">
+        {[
+          { icon: "f", color: "#3b5998" },
+          { icon: "𝕏", color: "#1da1f2" },
+          { icon: "in", color: "#0077b5" },
+          { icon: "▶", color: "#ff0000" },
+        ].map((social) => (
+          <div key={social.icon} className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+            <span className="text-xs text-gray-500">{social.icon}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 // Invitee Cancellation Notification Email
 const InviteeCancellationEmail = () => (
   <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
@@ -483,6 +544,7 @@ const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
   const typeSpecificVars: Record<EmailType, string[]> = {
     "host-confirmation": baseVars,
     "invitee-confirmation": [...baseVars, "{rescheduleLink}", "{cancelLink}"],
+    "legacy-invitee-confirmation": baseVars,
     "host-reschedule": [...baseVars, "{originalStartDate}", "{newStartDate}", "{rescheduleReason}"],
     "host-cancellation": [...baseVars, "{cancellationReason}"],
     "invitee-reschedule": [...baseVars, "{originalStartDate}", "{newStartDate}", "{rescheduleLink}", "{cancelLink}"],
@@ -519,6 +581,8 @@ const EmailPreview = ({ isMobilePreview: externalMobilePreview }: EmailPreviewPr
         return <HostConfirmationEmail />;
       case "invitee-confirmation":
         return <InviteeConfirmationEmail />;
+      case "legacy-invitee-confirmation":
+        return <LegacyInviteeConfirmationEmail />;
       case "host-reschedule":
         return <HostRescheduleEmail />;
       case "host-cancellation":
