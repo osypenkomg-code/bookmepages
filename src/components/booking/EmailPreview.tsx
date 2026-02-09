@@ -5,11 +5,12 @@ import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation" | "invitee-reschedule" | "invitee-cancellation" | "legacy-invitee-confirmation";
+type EmailType = "host-confirmation" | "invitee-confirmation" | "host-reschedule" | "host-cancellation" | "invitee-reschedule" | "invitee-cancellation" | "legacy-invitee-confirmation" | "legacy-host-confirmation";
 
 const emailTypes: { id: EmailType; label: string; description: string }[] = [
   { id: "host-confirmation", label: "Host Confirmation", description: "Sent to organizer when meeting is booked" },
   { id: "invitee-confirmation", label: "Invitee Confirmation", description: "Sent to attendee when meeting is booked" },
+  { id: "legacy-host-confirmation", label: "Legacy Host Confirmation", description: "Original HTML email sent to organizer (from EML)" },
   { id: "legacy-invitee-confirmation", label: "Legacy Invitee Confirmation", description: "Legacy email sent to attendee when meeting is booked" },
   { id: "host-reschedule", label: "Host Reschedule", description: "Sent to organizer when meeting is rescheduled" },
   { id: "host-cancellation", label: "Host Cancellation", description: "Sent to organizer when meeting is cancelled" },
@@ -550,6 +551,7 @@ const TemplateVariables = ({ emailType }: { emailType: EmailType }) => {
     "host-confirmation": baseVars,
     "invitee-confirmation": [...baseVars, "{rescheduleLink}", "{cancelLink}"],
     "legacy-invitee-confirmation": baseVars,
+    "legacy-host-confirmation": baseVars,
     "host-reschedule": [...baseVars, "{originalStartDate}", "{newStartDate}", "{rescheduleReason}"],
     "host-cancellation": [...baseVars, "{cancellationReason}"],
     "invitee-reschedule": [...baseVars, "{originalStartDate}", "{newStartDate}", "{rescheduleLink}", "{cancelLink}"],
@@ -589,6 +591,17 @@ const EmailPreview = ({ isMobilePreview: externalMobilePreview, onNavigateToAtte
         return <InviteeConfirmationEmail />;
       case "legacy-invitee-confirmation":
         return <LegacyInviteeConfirmationEmail onManageBooking={onNavigateToAttendee} />;
+      case "legacy-host-confirmation":
+        return (
+          <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-border">
+            <iframe
+              src="/legacy-host-confirmation.html"
+              title="Legacy Host Confirmation Email"
+              className="w-full border-0"
+              style={{ minHeight: "700px" }}
+            />
+          </div>
+        );
       case "host-reschedule":
         return <HostRescheduleEmail />;
       case "host-cancellation":
