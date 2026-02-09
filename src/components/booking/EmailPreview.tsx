@@ -427,7 +427,7 @@ const LegacyInviteeConfirmationEmail = ({ onManageBooking }: { onManageBooking?:
     {/* Main content card */}
     <div className="mx-4 mb-6 border border-gray-400 bg-white">
       {/* Green heading band */}
-      <div className="bg-[#b5d5a7] px-8 py-8">
+      <div className="bg-[#9ACEA8] px-8 py-8">
         <h1 className="text-3xl font-bold text-[#1a2942]">A new meeting has been confirmed</h1>
       </div>
 
