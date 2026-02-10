@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin, User, CalendarX, RefreshCw } from "lucide-react";
+import { Calendar, Clock, MapPin, User, CalendarX, RefreshCw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -44,6 +44,7 @@ interface AttendeeViewProps {
   booking?: BookingDetails;
   onReschedule: () => void;
   isMobilePreview?: boolean;
+  isExpired?: boolean;
 }
 
 const defaultBooking: BookingDetails = {
@@ -78,7 +79,7 @@ const formatDate = (date: Date, compact = false) => {
   });
 };
 
-const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview = false }: AttendeeViewProps) => {
+const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview = false, isExpired = false }: AttendeeViewProps) => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -139,13 +140,23 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
           <div className={cn(isMobile ? "p-3" : "p-6 md:p-10")}>
             {/* Status Badge */}
             <div className={cn("flex justify-center", isMobile ? "mb-2" : "mb-6")}>
-              <span className={cn(
-                "inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-700 font-medium",
-                isMobile ? "px-2.5 py-1 text-xs" : "px-4 py-2 text-sm gap-2"
-              )}>
-                <span className={cn("rounded-full bg-green-500 animate-pulse", isMobile ? "w-1.5 h-1.5" : "w-2 h-2")}></span>
-                Confirmed
-              </span>
+              {isExpired ? (
+                <span className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full bg-muted text-muted-foreground font-medium",
+                  isMobile ? "px-2.5 py-1 text-xs" : "px-4 py-2 text-sm gap-2"
+                )}>
+                  <Clock className={isMobile ? "w-3 h-3" : "w-4 h-4"} />
+                  Meeting Started
+                </span>
+              ) : (
+                <span className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-700 font-medium",
+                  isMobile ? "px-2.5 py-1 text-xs" : "px-4 py-2 text-sm gap-2"
+                )}>
+                  <span className={cn("rounded-full bg-green-500 animate-pulse", isMobile ? "w-1.5 h-1.5" : "w-2 h-2")}></span>
+                  Confirmed
+                </span>
+              )}
             </div>
 
             <h1 className={cn(
@@ -158,7 +169,7 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
               "text-center text-muted-foreground",
               isMobile ? "text-xs mb-3" : "mb-8"
             )}>
-              Your meeting is scheduled
+              {isExpired ? "This meeting has already started" : "Your meeting is scheduled"}
             </p>
 
             {/* Booking Details */}
@@ -216,10 +227,40 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
               </div>
             </div>
 
+            {/* Expired Notice */}
+            {isExpired && (
+              <div className={cn(
+                "bg-muted border border-border rounded-xl",
+                isMobile ? "p-3 mb-3" : "p-5 mb-6"
+              )}>
+                <div className="flex items-start gap-2">
+                  <AlertCircle className={cn(
+                    "text-muted-foreground shrink-0",
+                    isMobile ? "w-4 h-4 mt-0.5" : "w-5 h-5 mt-0.5"
+                  )} />
+                  <div>
+                    <p className={cn(
+                      "text-foreground font-medium",
+                      isMobile ? "text-xs mb-0.5" : "text-sm mb-1"
+                    )}>
+                      Modifications are no longer available
+                    </p>
+                    <p className={cn(
+                      "text-muted-foreground",
+                      isMobile ? "text-xs leading-tight" : "text-sm"
+                    )}>
+                      This meeting has already started. If you need to make changes, please contact the organizer directly.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className={cn("grid grid-cols-2", isMobile ? "gap-2" : "gap-4")}>
               <Button
                 onClick={handleReschedule}
+                disabled={isExpired}
                 className={cn(
                   "flex items-center justify-center gap-2",
                   isMobile ? "h-10 text-xs" : "h-14"
@@ -231,9 +272,11 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
               <Button
                 variant="outline"
                 onClick={() => setShowCancelDialog(true)}
+                disabled={isExpired}
                 className={cn(
                   "flex items-center justify-center gap-2 border-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive",
-                  isMobile ? "h-10 text-xs" : "h-14"
+                  isMobile ? "h-10 text-xs" : "h-14",
+                  isExpired && "border-border text-muted-foreground"
                 )}
               >
                 <CalendarX className={isMobile ? "w-4 h-4" : "w-5 h-5"} />
@@ -241,7 +284,19 @@ const AttendeeView = ({ booking = defaultBooking, onReschedule, isMobilePreview 
               </Button>
             </div>
 
-            {!isMobile && (
+            {isExpired && (
+              <div className={cn("flex justify-center", isMobile ? "mt-3" : "mt-6")}>
+                <Button
+                  variant="default"
+                  className={cn(isMobile ? "h-9 text-xs" : "h-12")}
+                  onClick={() => window.location.href = `mailto:${booking.organizerEmail}?subject=Regarding: ${booking.title}`}
+                >
+                  Contact Organizer
+                </Button>
+              </div>
+            )}
+
+            {!isMobile && !isExpired && (
               <p className="text-xs text-muted-foreground text-center mt-6">
                 You can reschedule or cancel until the host's cutoff time.
               </p>

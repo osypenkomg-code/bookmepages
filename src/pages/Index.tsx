@@ -58,6 +58,8 @@ const Index = () => {
         );
       case "attendee":
         return <AttendeeView onReschedule={handleReschedule} isMobilePreview={isMobilePreview} />;
+      case "attendee-expired":
+        return <AttendeeView onReschedule={handleReschedule} isMobilePreview={isMobilePreview} isExpired={true} />;
       case "email-preview":
         return <EmailPreview isMobilePreview={isMobilePreview} onNavigateToAttendee={() => setViewMode("attendee")} />;
       case "too-late":

@@ -3,7 +3,7 @@ import { Mail, Clock, Smartphone, Monitor, Settings2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export type ViewMode = "organizer-classic" | "organizer-wizard" | "attendee" | "email-preview" | "too-late";
+export type ViewMode = "organizer-classic" | "organizer-wizard" | "attendee" | "attendee-expired" | "email-preview" | "too-late";
 export type PlatformMode = "full" | "custom" | "disabled";
 
 export interface EnabledPlatforms {
@@ -27,6 +27,7 @@ const views: { id: ViewMode; label: string; description: string; icon?: React.Re
   { id: "organizer-classic", label: "Classic", description: "Side-by-side view" },
   { id: "organizer-wizard", label: "Wizard", description: "Step-by-step" },
   { id: "attendee", label: "Attendee", description: "Manage booking" },
+  { id: "attendee-expired", label: "Expired", description: "Meeting already started", icon: <Clock className="w-4 h-4" /> },
   { id: "email-preview", label: "Email", description: "Confirmation email preview", icon: <Mail className="w-4 h-4" /> },
   { id: "too-late", label: "Too Late", description: "Cutoff time reached", icon: <Clock className="w-4 h-4" /> },
 ];
