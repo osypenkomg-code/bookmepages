@@ -10,6 +10,7 @@ import RevenuegridLogo from "@/assets/revenuegrid-logo.svg";
 import StepIndicator from "./StepIndicator";
 import LocationSelector, { LocationType } from "./LocationSelector";
 import BookingCalendar from "./BookingCalendar";
+import BookingLoadingAnimation from "./BookingLoadingAnimation";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface BookingFormData {
@@ -114,6 +115,7 @@ const BookingWizard = ({
     platformMode === "disabled" ? "teams" : platformMode === "custom" ? null : "zoom"
   );
   const [customLocation, setCustomLocation] = useState("");
+  const [isBooking, setIsBooking] = useState(false);
   const [formData, setFormData] = useState<BookingFormData>({
     fullName: isRescheduling ? "John Doe" : "",
     email: isRescheduling ? "john.doe@example.com" : "",
@@ -196,10 +198,15 @@ const BookingWizard = ({
   };
 
   const handleSubmit = () => {
+    setIsBooking(true);
+  };
+
+  const handleBookingComplete = () => {
     toast({
       title: isRescheduling ? "Meeting Rescheduled!" : "Meeting Booked!",
       description: `Your meeting has been ${isRescheduling ? "rescheduled" : "confirmed"} for ${selectedDate?.toLocaleDateString()} at ${selectedTime} via ${getLocationDisplay()}.`,
     });
+    setIsBooking(false);
     onComplete?.();
   };
 
@@ -542,10 +549,19 @@ const BookingWizard = ({
               "flex items-center justify-center",
               isMobile ? "min-h-0" : "min-h-[400px]"
             )}>
-              {renderStepContent()}
+              {isBooking ? (
+                <BookingLoadingAnimation
+                  onComplete={handleBookingComplete}
+                  isRescheduling={isRescheduling}
+                  compact={isMobile}
+                />
+              ) : (
+                renderStepContent()
+              )}
             </div>
 
-            {/* Navigation */}
+            {/* Navigation - hidden during booking animation */}
+            {!isBooking && (
             <div className={cn(
               "flex items-center justify-between border-t border-border",
               isMobile ? "mt-3 pt-3" : "mt-8 pt-6"
@@ -578,6 +594,7 @@ const BookingWizard = ({
                 {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4 ml-1" />}
               </Button>
             </div>
+            )}
           </div>
         </div>
       </div>
