@@ -56,7 +56,7 @@ const BookingLoadingAnimation = ({ onComplete, isRescheduling = false, compact =
     )}>
       {/* Animated logo */}
       <div className={cn(
-        "relative mb-8",
+        "relative",
         compact ? "mb-5" : "mb-8"
       )}>
         <div className={cn(
@@ -66,12 +66,7 @@ const BookingLoadingAnimation = ({ onComplete, isRescheduling = false, compact =
           <img
             src={RevenuegridLogo}
             alt="Revenue Grid"
-            className={cn(
-              "object-contain",
-              compact ? "h-8" : "h-12",
-              "animate-[spin_3s_linear_infinite]"
-            )}
-            style={{ animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)" }}
+            className={cn("object-contain", compact ? "h-8" : "h-12")}
           />
         </div>
         {isDone && (
