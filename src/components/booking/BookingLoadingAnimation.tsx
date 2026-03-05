@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
 const STATUSES = [
-  { text: "Connecting to calendar...", duration: 1000 },
-  { text: "Reserving your time slot...", duration: 1200 },
-  { text: "Sending confirmation...", duration: 1000 },
-  { text: "Meeting booked!", duration: 800 },
+  { text: "Checking availability...", duration: 1000 },
+  { text: "Securing your spot...", duration: 1200 },
+  { text: "Preparing your confirmation email...", duration: 1000 },
+  { text: "You're all set!", duration: 800 },
 ];
 
 interface BookingLoadingAnimationProps {
@@ -22,10 +22,10 @@ const BookingLoadingAnimation = ({ onComplete, isRescheduling = false, compact =
 
   const statuses = isRescheduling
     ? [
-        { text: "Connecting to calendar...", duration: 1000 },
-        { text: "Updating your time slot...", duration: 1200 },
-        { text: "Sending updated confirmation...", duration: 1000 },
-        { text: "Meeting rescheduled!", duration: 800 },
+        { text: "Checking new availability...", duration: 1000 },
+        { text: "Updating your booking...", duration: 1200 },
+        { text: "Sending updated details to your inbox...", duration: 1000 },
+        { text: "Your meeting has been rescheduled!", duration: 800 },
       ]
     : STATUSES;
 
